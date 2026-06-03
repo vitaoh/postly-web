@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 public final class FirebaseConfig {
 
@@ -82,8 +84,28 @@ public final class FirebaseConfig {
             }
         }
 
+        Optional<Path> credencialPrivada = buscarCredencialEmPrivate(diretorioAtual);
+        if (credencialPrivada.isPresent()) {
+            return Files.newInputStream(credencialPrivada.get());
+        }
+
         throw new IllegalStateException(
-                "Coloque o serviceAccountKey.json em private/serviceAccountKey.json ou configure "
-                        + "a propriedade firebase.serviceAccountKey com o caminho absoluto do arquivo.");
+                "Coloque o JSON da chave privada do Firebase em private/ ou configure "
+                        + "firebase.serviceAccountKey com o caminho absoluto do arquivo.");
+    }
+
+    private static Optional<Path> buscarCredencialEmPrivate(Path diretorioAtual) throws IOException {
+        Path privateDir = diretorioAtual.resolve("private");
+        if (!Files.isDirectory(privateDir)) {
+            return Optional.empty();
+        }
+
+        try (Stream<Path> arquivos = Files.list(privateDir)) {
+            return arquivos
+                    .filter(Files::isRegularFile)
+                    .filter(path -> path.getFileName().toString().endsWith(".json"))
+                    .filter(path -> !path.getFileName().toString().equals("serviceAccountKey.example.json"))
+                    .findFirst();
+        }
     }
 }
