@@ -53,7 +53,8 @@
         </article>
       </c:forEach>
     </section>
-    <form class="comment-form" action="${pageContext.request.contextPath}/post" method="get">
+    <form class="composer-bar" action="${pageContext.request.contextPath}/post" method="get">
+      <img class="avatar comment-avatar" src="${pageContext.request.contextPath}/${usuario.photo}" alt="${usuario.name}">
       <input class="field" name="comment" placeholder="Write a comment...">
       <button class="btn" type="submit">➜</button>
     </form>

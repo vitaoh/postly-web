@@ -17,6 +17,7 @@ import java.io.IOException;
         "/postar",
         "/editar-post",
         "/mensagens",
+        "/chat",
         "/perfil",
         "/configuracoes",
         "/mudar-senha",
@@ -51,6 +52,7 @@ public class PostlyPageController extends HttpServlet {
             case "/postar" -> "/WEB-INF/views/postar.jsp";
             case "/editar-post" -> "/WEB-INF/views/editar-post.jsp";
             case "/mensagens" -> "/WEB-INF/views/mensagens.jsp";
+            case "/chat" -> "/WEB-INF/views/chat.jsp";
             case "/perfil" -> "/WEB-INF/views/perfil.jsp";
             case "/configuracoes" -> "/WEB-INF/views/configuracoes.jsp";
             case "/mudar-senha" -> "/WEB-INF/views/mudar-senha.jsp";

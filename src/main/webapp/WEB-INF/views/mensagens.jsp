@@ -22,7 +22,7 @@
   <main class="content">
     <section class="messages-list">
       <c:forEach var="conversa" items="${conversas}">
-        <a class="conversation" href="#">
+        <a class="conversation" href="${pageContext.request.contextPath}/chat">
           <img class="avatar" src="${pageContext.request.contextPath}/${outroUsuario.photo}" alt="${outroUsuario.name}">
           <span>
             <strong>${outroUsuario.name}</strong>
