@@ -15,6 +15,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
@@ -59,6 +60,19 @@ public class FirebaseChatDAO {
 
         chatRef.set(chat).get();
         return chat;
+    }
+
+    public Optional<ChatThread> buscarPorId(String chatId) throws ExecutionException, InterruptedException {
+        if (estaVazio(chatId)) {
+            return Optional.empty();
+        }
+
+        DocumentSnapshot snapshot = firestore.collection(COLECAO_CHATS).document(chatId).get().get();
+        if (!snapshot.exists()) {
+            return Optional.empty();
+        }
+
+        return Optional.ofNullable(converterChat(snapshot));
     }
 
     public List<ChatThread> listarConversas(String userId) throws ExecutionException, InterruptedException {

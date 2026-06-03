@@ -1,6 +1,7 @@
 package com.victor.postlyweb.controllers;
 
 import com.victor.postlyweb.service.PostlyDemoService;
+import com.victor.postlyweb.service.ImagemBase64Service;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -26,6 +27,7 @@ import java.io.IOException;
 public class PostlyPageController extends HttpServlet {
 
     private final PostlyDemoService demoService = new PostlyDemoService();
+    private final ImagemBase64Service imagemService = new ImagemBase64Service();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -42,6 +44,7 @@ public class PostlyPageController extends HttpServlet {
         request.setAttribute("comentarios", demoService.comentarios());
         request.setAttribute("conversas", demoService.conversas());
         request.setAttribute("mensagens", demoService.mensagens());
+        request.setAttribute("imagemService", imagemService);
     }
 
     private String viewPara(String path) {

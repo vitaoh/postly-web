@@ -20,7 +20,7 @@
     <a class="icon-link" href="${pageContext.request.contextPath}/configuracoes" aria-label="Settings">⚙</a>
   </header>
   <section class="profile-header">
-    <img class="avatar large" src="${pageContext.request.contextPath}/${usuario.photo}" alt="${usuario.name}">
+    <img class="avatar large" src="${imagemService.src(pageContext.request.contextPath, usuario.photo)}" alt="${usuario.name}">
     <h1>${usuario.name}</h1>
     <span class="muted">@${usuario.username}</span>
     <div class="stats">
@@ -34,7 +34,7 @@
     <c:forEach var="post" items="${posts}" varStatus="status">
       <article class="post-card">
         <div class="post-head">
-          <img class="avatar" src="${pageContext.request.contextPath}/${usuario.photo}" alt="${usuario.name}">
+          <img class="avatar" src="${imagemService.src(pageContext.request.contextPath, usuario.photo)}" alt="${usuario.name}">
           <div class="post-author">
             <strong>${usuario.name}</strong>
             <span>@${usuario.username} · ${status.index + 4}d</span>
@@ -42,7 +42,7 @@
         </div>
         <p class="post-text">${post.description}</p>
         <c:if test="${not empty post.image}">
-          <img class="post-image" src="${pageContext.request.contextPath}/${post.image}" alt="Post media">
+          <img class="post-image" src="${imagemService.src(pageContext.request.contextPath, post.image)}" alt="Post media">
         </c:if>
         <div class="post-metrics">
           <span class="liked">♡ ${post.likeCount}</span>

@@ -20,7 +20,7 @@
       <span></span>
     </header>
     <div class="profile-photo-zone">
-      <img class="avatar large" src="${pageContext.request.contextPath}/${usuario.photo}" alt="${usuario.name}">
+      <img class="avatar large" src="${imagemService.src(pageContext.request.contextPath, usuario.photo)}" alt="${usuario.name}">
       <a class="text-link" href="#">Change photo</a>
     </div>
     <section class="settings-card">

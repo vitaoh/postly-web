@@ -8,11 +8,18 @@ import com.google.firebase.cloud.FirestoreClient;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public final class FirebaseConfig {
 
     private static final String CREDENTIALS_ENV = "GOOGLE_APPLICATION_CREDENTIALS";
     private static final String CREDENTIALS_PROPERTY = "firebase.serviceAccountKey";
+    private static final String[] CREDENTIALS_LOCAL_PATHS = {
+            "private/serviceAccountKey.json",
+            "serviceAccountKey.json"
+    };
 
     private static volatile FirebaseApp app;
 
@@ -44,18 +51,7 @@ public final class FirebaseConfig {
             return FirebaseApp.getInstance();
         }
 
-        String caminhoCredenciais = System.getProperty(CREDENTIALS_PROPERTY);
-        if (estaVazio(caminhoCredenciais)) {
-            caminhoCredenciais = System.getenv(CREDENTIALS_ENV);
-        }
-
-        if (estaVazio(caminhoCredenciais)) {
-            throw new IllegalStateException(
-                    "Configure a variavel GOOGLE_APPLICATION_CREDENTIALS ou a propriedade firebase.serviceAccountKey "
-                            + "com o caminho do arquivo serviceAccountKey.json.");
-        }
-
-        try (FileInputStream serviceAccount = new FileInputStream(caminhoCredenciais)) {
+        try (InputStream serviceAccount = abrirCredenciais()) {
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                     .build();
@@ -66,5 +62,28 @@ public final class FirebaseConfig {
 
     private static boolean estaVazio(String valor) {
         return valor == null || valor.trim().isEmpty();
+    }
+
+    private static InputStream abrirCredenciais() throws IOException {
+        String caminhoCredenciais = System.getProperty(CREDENTIALS_PROPERTY);
+        if (estaVazio(caminhoCredenciais)) {
+            caminhoCredenciais = System.getenv(CREDENTIALS_ENV);
+        }
+
+        if (!estaVazio(caminhoCredenciais)) {
+            return new FileInputStream(caminhoCredenciais);
+        }
+
+        Path diretorioAtual = Path.of(System.getProperty("user.dir"));
+        for (String caminhoLocal : CREDENTIALS_LOCAL_PATHS) {
+            Path candidato = diretorioAtual.resolve(caminhoLocal);
+            if (Files.exists(candidato)) {
+                return Files.newInputStream(candidato);
+            }
+        }
+
+        throw new IllegalStateException(
+                "Coloque o serviceAccountKey.json em private/serviceAccountKey.json ou configure "
+                        + "a propriedade firebase.serviceAccountKey com o caminho absoluto do arquivo.");
     }
 }

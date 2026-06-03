@@ -20,7 +20,7 @@
       <form action="${pageContext.request.contextPath}/home" method="get">
         <label class="muted" for="description">What's on your mind?</label>
         <textarea class="textarea" id="description" name="description">${postPrincipal.description}</textarea>
-        <img class="post-image" src="${pageContext.request.contextPath}/${postPrincipal.image}" alt="Current post media">
+        <img class="post-image" src="${imagemService.src(pageContext.request.contextPath, postPrincipal.image)}" alt="Current post media">
         <div class="media-actions">
           <button class="btn outline" type="button">▣ Image</button>
           <button class="btn outline" type="button">⌾ Location</button>

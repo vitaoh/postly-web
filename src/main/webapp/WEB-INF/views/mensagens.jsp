@@ -23,7 +23,7 @@
     <section class="messages-list">
       <c:forEach var="conversa" items="${conversas}">
         <a class="conversation" href="${pageContext.request.contextPath}/chat">
-          <img class="avatar" src="${pageContext.request.contextPath}/${outroUsuario.photo}" alt="${outroUsuario.name}">
+          <img class="avatar" src="${imagemService.src(pageContext.request.contextPath, outroUsuario.photo)}" alt="${outroUsuario.name}">
           <span>
             <strong>${outroUsuario.name}</strong>
             <p>You: ${conversa.lastMessage}</p>

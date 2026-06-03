@@ -11,10 +11,12 @@ import com.victor.postlyweb.config.FirebaseConfig;
 import com.victor.postlyweb.modelo.Usuario;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 public class FirebaseUsuarioDAO {
 
@@ -85,6 +87,21 @@ public class FirebaseUsuarioDAO {
 
     public int contarSeguindo(String uid) throws ExecutionException, InterruptedException {
         return usuarioRef(uid).collection(SUBCOLECAO_FOLLOWING).get().get().size();
+    }
+
+    public List<String> listarSeguindoIds(String uid) throws ExecutionException, InterruptedException {
+        return usuarioRef(uid)
+                .collection(SUBCOLECAO_FOLLOWING)
+                .get()
+                .get()
+                .getDocuments()
+                .stream()
+                .map(documento -> {
+                    String userId = documento.getString("userId");
+                    return estaVazio(userId) ? documento.getId() : userId;
+                })
+                .filter(userId -> !estaVazio(userId))
+                .collect(Collectors.toList());
     }
 
     public void seguir(String usuarioAtualId, String usuarioAlvoId) throws ExecutionException, InterruptedException {

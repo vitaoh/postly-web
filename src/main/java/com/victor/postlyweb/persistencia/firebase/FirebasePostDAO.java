@@ -9,6 +9,7 @@ import com.victor.postlyweb.config.FirebaseConfig;
 import com.victor.postlyweb.modelo.Post;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -75,6 +76,39 @@ public class FirebasePostDAO {
                 .stream()
                 .map(this::converterPost)
                 .filter(Objects::nonNull)
+                .sorted(Comparator.comparingLong(this::timestamp).reversed())
+                .collect(Collectors.toList());
+    }
+
+    public List<Post> listarPorUsuarios(List<String> userIds) throws ExecutionException, InterruptedException {
+        if (userIds == null || userIds.isEmpty()) {
+            return List.of();
+        }
+
+        List<String> ids = userIds.stream()
+                .filter(id -> !estaVazio(id))
+                .distinct()
+                .collect(Collectors.toList());
+
+        if (ids.isEmpty()) {
+            return List.of();
+        }
+
+        List<Post> posts = new ArrayList<>();
+        for (int inicio = 0; inicio < ids.size(); inicio += 10) {
+            List<String> bloco = ids.subList(inicio, Math.min(inicio + 10, ids.size()));
+            posts.addAll(firestore.collection(COLECAO_POSTS)
+                    .whereIn("userId", bloco)
+                    .get()
+                    .get()
+                    .getDocuments()
+                    .stream()
+                    .map(this::converterPost)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList()));
+        }
+
+        return posts.stream()
                 .sorted(Comparator.comparingLong(this::timestamp).reversed())
                 .collect(Collectors.toList());
     }

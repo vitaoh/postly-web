@@ -22,7 +22,7 @@
   <main class="content">
     <article class="post-card">
       <div class="post-head">
-        <img class="avatar" src="${pageContext.request.contextPath}/${usuario.photo}" alt="${usuario.name}">
+        <img class="avatar" src="${imagemService.src(pageContext.request.contextPath, usuario.photo)}" alt="${usuario.name}">
         <div class="post-author">
           <strong>${usuario.name}</strong>
           <span>@${usuario.username} · 4d</span>
@@ -33,7 +33,7 @@
         </div>
       </div>
       <p class="post-text">${postPrincipal.description}</p>
-      <img class="post-image" src="${pageContext.request.contextPath}/${postPrincipal.image}" alt="Post media">
+      <img class="post-image" src="${imagemService.src(pageContext.request.contextPath, postPrincipal.image)}" alt="Post media">
       <div class="post-metrics">
         <span class="liked">♡ ${postPrincipal.likeCount}</span>
         <span>♡ ${postPrincipal.commentCount}</span>
@@ -44,7 +44,7 @@
     <section class="comments-list">
       <c:forEach var="comentario" items="${comentarios}">
         <article class="comment">
-          <img class="avatar" src="${pageContext.request.contextPath}/${usuario.photo}" alt="${usuario.name}">
+          <img class="avatar" src="${imagemService.src(pageContext.request.contextPath, usuario.photo)}" alt="${usuario.name}">
           <span>
             <strong>${usuario.name}</strong> <span class="muted">@${usuario.username} · 1d</span>
             <p>${comentario.text}</p>
@@ -54,7 +54,7 @@
       </c:forEach>
     </section>
     <form class="composer-bar" action="${pageContext.request.contextPath}/post" method="get">
-      <img class="avatar comment-avatar" src="${pageContext.request.contextPath}/${usuario.photo}" alt="${usuario.name}">
+      <img class="avatar comment-avatar" src="${imagemService.src(pageContext.request.contextPath, usuario.photo)}" alt="${usuario.name}">
       <input class="field" name="comment" placeholder="Write a comment...">
       <button class="btn" type="submit">➜</button>
     </form>

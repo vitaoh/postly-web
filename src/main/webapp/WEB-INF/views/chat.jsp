@@ -17,7 +17,7 @@
   <header class="appbar compact">
     <a class="icon-link" href="${pageContext.request.contextPath}/mensagens" aria-label="Back">‹</a>
     <div class="chat-header">
-      <img class="avatar" src="${pageContext.request.contextPath}/${outroUsuario.photo}" alt="${outroUsuario.name}">
+      <img class="avatar" src="${imagemService.src(pageContext.request.contextPath, outroUsuario.photo)}" alt="${outroUsuario.name}">
       <span class="chat-header-text">
         <strong>${outroUsuario.name}</strong>
         <span>@${outroUsuario.username}</span>

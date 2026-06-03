@@ -16,7 +16,7 @@
   </div>
   <header class="appbar">
     <a href="${pageContext.request.contextPath}/perfil" aria-label="Profile">
-      <img class="avatar" src="${pageContext.request.contextPath}/${usuario.photo}" alt="${usuario.name}">
+      <img class="avatar" src="${imagemService.src(pageContext.request.contextPath, usuario.photo)}" alt="${usuario.name}">
     </a>
     <img class="logo-mark" src="${pageContext.request.contextPath}/assets/img/logo.png" alt="Postly">
     <a class="icon-link" href="${pageContext.request.contextPath}/mensagens" aria-label="Messages">▱</a>
@@ -35,7 +35,7 @@
     <c:forEach var="post" items="${posts}" varStatus="status">
       <article class="post-card">
         <div class="post-head">
-          <img class="avatar" src="${pageContext.request.contextPath}/${usuario.photo}" alt="${usuario.name}">
+          <img class="avatar" src="${imagemService.src(pageContext.request.contextPath, usuario.photo)}" alt="${usuario.name}">
           <div class="post-author">
             <strong>${usuario.name}</strong>
             <span>@${usuario.username} · ${status.index + 4}d</span>
@@ -48,7 +48,7 @@
         <p class="post-text">${post.description}</p>
         <c:if test="${not empty post.image}">
           <a href="${pageContext.request.contextPath}/post">
-            <img class="post-image" src="${pageContext.request.contextPath}/${post.image}" alt="Post media">
+            <img class="post-image" src="${imagemService.src(pageContext.request.contextPath, post.image)}" alt="Post media">
           </a>
         </c:if>
         <div class="post-metrics">
