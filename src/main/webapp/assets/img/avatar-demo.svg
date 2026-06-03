@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="Postly user avatar">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#f6f0ff"/>
+      <stop offset="1" stop-color="#b46cff"/>
+    </linearGradient>
+  </defs>
+  <rect width="160" height="160" rx="80" fill="url(#bg)"/>
+  <circle cx="80" cy="62" r="30" fill="#ffffff"/>
+  <path d="M34 135c9-31 30-48 46-48s37 17 46 48" fill="#ffffff"/>
+  <circle cx="122" cy="62" r="9" fill="#f47b20"/>
+  <circle cx="138" cy="66" r="6" fill="#f47b20"/>
+</svg>
