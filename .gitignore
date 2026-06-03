@@ -2,6 +2,7 @@
 serviceAccountKey.json
 **/serviceAccountKey.json
 private/*.json
+!private/serviceAccountKey.example.json
 
 # Build output
 target/

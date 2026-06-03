@@ -1,17 +1,80 @@
 :root {
+  color-scheme: light;
   --purple: #9539CB;
   --purple-strong: #a844e0;
   --purple-dark: #3a104d;
-  --ink: #100d14;
-  --ink-2: #151019;
-  --panel: #21142b;
-  --panel-2: #2b1837;
-  --muted: #a89aae;
-  --line: #493052;
+  --app-bg: #ebe7ef;
+  --shell-bg: #ffffff;
+  --ink: #ffffff;
+  --ink-2: #f7f1fb;
+  --panel: #ffffff;
+  --panel-2: #f4e9fa;
+  --elevated: #ffffff;
+  --dialog-bg: #ffffff;
+  --field-bg: #f7f0fb;
+  --field-border: #ddcbe8;
+  --placeholder: #7a6b82;
+  --muted: #6f6275;
+  --line: #dfcfe8;
+  --panel-border: #dfcfe8;
+  --avatar-border: rgba(23, 18, 27, 0.16);
+  --toolbar-border: rgba(255, 255, 255, 0.76);
+  --text: #17121b;
+  --text-soft: #3a3141;
+  --text-inverse: #ffffff;
+  --status-text: #17121b;
+  --status-icon: #17121b;
+  --search-bg: #ffffff;
+  --tab-bg: #f3e5f8;
+  --post-bg: #ffffff;
+  --media-bg: #e8e2ec;
+  --metric-text: #4f4557;
+  --shadow: rgba(34, 18, 43, 0.16);
+  --auth-bg: var(--purple);
+  --sheet-gradient: linear-gradient(180deg, rgba(149, 57, 203, 0.24), rgba(255, 255, 255, 0.98));
+  --settings-bg: linear-gradient(180deg, var(--purple) 0%, #b44ae0 100%);
+  --modal-bg: linear-gradient(180deg, rgba(149, 57, 203, 0.64), rgba(246, 235, 252, 0.96));
   --white: #ffffff;
   --danger: #D32F2F;
   --success: #16A34A;
   --info: #6db7ff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --app-bg: #27292d;
+    --shell-bg: #100d14;
+    --ink: #100d14;
+    --ink-2: #151019;
+    --panel: #21142b;
+    --panel-2: #2b1837;
+    --elevated: #120e16;
+    --dialog-bg: #2a2830;
+    --field-bg: #26162f;
+    --field-border: #160d1d;
+    --placeholder: #c8bdcf;
+    --muted: #a89aae;
+    --line: #493052;
+    --panel-border: rgba(255, 255, 255, 0.06);
+    --avatar-border: rgba(255, 255, 255, 0.14);
+    --toolbar-border: rgba(255, 255, 255, 0.76);
+    --text: #ffffff;
+    --text-soft: #f2edf5;
+    --text-inverse: #ffffff;
+    --status-text: #ffffff;
+    --status-icon: #ffffff;
+    --search-bg: #070609;
+    --tab-bg: #100713;
+    --post-bg: #120e16;
+    --media-bg: #2a2a31;
+    --metric-text: #e9e3ef;
+    --shadow: rgba(0, 0, 0, 0.35);
+    --auth-bg: var(--purple);
+    --sheet-gradient: linear-gradient(180deg, rgba(166, 56, 214, 0.48), rgba(16, 13, 20, 0.98));
+    --settings-bg: linear-gradient(180deg, var(--purple) 0%, #a22fd0 100%);
+    --modal-bg: linear-gradient(180deg, rgba(60, 15, 82, 0.92), rgba(20, 9, 29, 0.96));
+  }
 }
 
 * {
@@ -21,8 +84,8 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: #27292d;
-  color: var(--white);
+  background: var(--app-bg);
+  color: var(--text);
   font-family: Inter, "Segoe UI", Arial, sans-serif;
 }
 
@@ -41,7 +104,7 @@ textarea {
   width: min(100%, 420px);
   min-height: 100vh;
   margin: 0 auto;
-  background: var(--ink);
+  background: var(--shell-bg);
   position: relative;
   overflow-x: hidden;
 }
@@ -50,13 +113,16 @@ textarea {
   .phone-shell {
     min-height: 900px;
     margin-block: 24px;
-    border: 1px solid #373a40;
-    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+    border: 1px solid var(--line);
+    box-shadow: 0 24px 80px var(--shadow);
   }
 }
 
 .auth-gradient {
-  background: var(--purple);
+  --status-text: var(--text-inverse);
+  --status-icon: var(--text-inverse);
+  background: var(--auth-bg);
+  color: var(--text-inverse);
 }
 
 .statusbar {
@@ -65,7 +131,7 @@ textarea {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  color: var(--white);
+  color: var(--status-text);
   font-size: 12px;
 }
 
@@ -84,12 +150,12 @@ textarea {
 
 .signal {
   width: 16px;
-  background: linear-gradient(90deg, transparent 0 18%, #fff 18% 30%, transparent 30% 42%, #fff 42% 54%, transparent 54% 66%, #fff 66%);
+  background: linear-gradient(90deg, transparent 0 18%, var(--status-icon) 18% 30%, transparent 30% 42%, var(--status-icon) 42% 54%, transparent 54% 66%, var(--status-icon) 66%);
 }
 
 .wifi {
   width: 12px;
-  border: 2px solid #fff;
+  border: 2px solid var(--status-icon);
   border-left-color: transparent;
   border-bottom-color: transparent;
   border-radius: 12px;
@@ -98,7 +164,7 @@ textarea {
 
 .battery {
   width: 21px;
-  border: 2px solid #fff;
+  border: 2px solid var(--status-icon);
   border-radius: 5px;
   position: relative;
 }
@@ -107,7 +173,7 @@ textarea {
   content: "";
   width: 3px;
   height: 6px;
-  background: #fff;
+  background: var(--status-icon);
   border-radius: 0 3px 3px 0;
   position: absolute;
   right: -5px;
@@ -118,6 +184,7 @@ textarea {
   min-height: 64px;
   padding: 10px 16px;
   background: var(--purple);
+  color: var(--text-inverse);
   display: grid;
   grid-template-columns: 44px 1fr 44px;
   gap: 12px;
@@ -153,7 +220,7 @@ textarea {
   height: 42px;
   border-radius: 50%;
   object-fit: cover;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--avatar-border);
 }
 
 .avatar.large {
@@ -170,7 +237,7 @@ textarea {
   display: inline-grid;
   place-items: center;
   background: transparent;
-  color: var(--white);
+  color: inherit;
   font-size: 24px;
   cursor: pointer;
 }
@@ -197,7 +264,7 @@ textarea {
 
 .tagline {
   margin: 26px 0 34px;
-  color: var(--white);
+  color: var(--text-inverse);
   font-size: 14px;
 }
 
@@ -207,9 +274,10 @@ textarea {
 .sheet {
   width: 100%;
   background: var(--panel);
+  color: var(--text);
   border-radius: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.24);
+  border: 1px solid var(--panel-border);
+  box-shadow: 0 18px 48px var(--shadow);
 }
 
 .auth-card {
@@ -248,17 +316,17 @@ textarea {
 .field,
 .textarea {
   width: 100%;
-  border: 1px solid #160d1d;
+  border: 1px solid var(--field-border);
   border-radius: 14px;
-  background: #26162f;
-  color: var(--white);
+  background: var(--field-bg);
+  color: var(--text);
   padding: 14px 14px;
   outline: none;
 }
 
 .field::placeholder,
 .textarea::placeholder {
-  color: #c8bdcf;
+  color: var(--placeholder);
 }
 
 .textarea {
@@ -296,7 +364,7 @@ textarea {
   justify-content: center;
   gap: 8px;
   background: var(--purple);
-  color: var(--white);
+  color: var(--text-inverse);
   font-weight: 700;
   cursor: pointer;
 }
@@ -334,7 +402,7 @@ textarea {
   display: flex;
   align-items: center;
   gap: 12px;
-  background: #070609;
+  background: var(--search-bg);
   color: var(--muted);
   padding: 0 14px;
 }
@@ -345,30 +413,30 @@ textarea {
   border: 0;
   outline: 0;
   background: transparent;
-  color: var(--white);
+  color: var(--text);
 }
 
 .tabs {
   margin-top: 10px;
   height: 40px;
-  border: 1px solid rgba(255, 255, 255, 0.76);
+  border: 1px solid var(--toolbar-border);
   border-radius: 12px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   overflow: hidden;
-  background: #100713;
+  background: var(--tab-bg);
 }
 
 .tab {
   display: grid;
   place-items: center;
   font-size: 13px;
-  color: #d9b7ea;
+  color: var(--purple);
 }
 
 .tab.active {
   background: var(--purple);
-  color: var(--white);
+  color: var(--text-inverse);
   font-weight: 800;
 }
 
@@ -381,7 +449,7 @@ textarea {
   border-radius: 20px;
   padding: 16px;
   margin: 6px 0 12px;
-  background: #120e16;
+  background: var(--post-bg);
 }
 
 .post-head {
@@ -423,16 +491,16 @@ textarea {
   object-fit: cover;
   border-radius: 16px;
   display: block;
-  background: #2a2a31;
+  background: var(--media-bg);
 }
 
 .post-metrics {
   margin-top: 12px;
   padding-top: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--line);
   display: flex;
   gap: 18px;
-  color: #e9e3ef;
+  color: var(--metric-text);
   font-size: 13px;
 }
 
@@ -453,7 +521,7 @@ textarea {
   justify-content: center;
   gap: 8px;
   background: var(--purple);
-  color: var(--white);
+  color: var(--text-inverse);
   font-weight: 800;
   box-shadow: 0 12px 30px rgba(166, 56, 214, 0.35);
 }
@@ -461,7 +529,7 @@ textarea {
 .sheet-page {
   min-height: calc(100vh - 34px);
   padding: 190px 18px 40px;
-  background: linear-gradient(180deg, rgba(166, 56, 214, 0.48), rgba(16, 13, 20, 0.98)), var(--ink);
+  background: var(--sheet-gradient), var(--shell-bg);
 }
 
 .sheet {
@@ -473,7 +541,7 @@ textarea {
   height: 4px;
   margin: -10px auto 18px;
   border-radius: 999px;
-  background: #7a6e82;
+  background: var(--muted);
 }
 
 .media-actions {
@@ -500,7 +568,7 @@ textarea {
 .conversation p,
 .comment p {
   margin: 4px 0 0;
-  color: #f2edf5;
+  color: var(--text-soft);
   font-size: 13px;
 }
 
@@ -527,7 +595,7 @@ textarea {
 }
 
 .stat span {
-  color: #d7cedd;
+  color: var(--muted);
   font-size: 11px;
 }
 
@@ -538,7 +606,7 @@ textarea {
 
 .settings-page {
   min-height: calc(100vh - 34px);
-  background: linear-gradient(180deg, var(--purple) 0%, #a22fd0 100%);
+  background: var(--settings-bg);
   padding-bottom: 44px;
 }
 
@@ -551,13 +619,13 @@ textarea {
 .settings-card label {
   display: grid;
   gap: 6px;
-  color: #d8cddd;
+  color: var(--muted);
   font-size: 12px;
 }
 
 .settings-card hr {
   border: 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--line);
   margin: 20px 0;
 }
 
@@ -571,17 +639,17 @@ textarea {
 .modal-overlay {
   min-height: calc(100vh - 34px);
   padding: 120px 28px 40px;
-  background: linear-gradient(180deg, rgba(60, 15, 82, 0.92), rgba(20, 9, 29, 0.96)), var(--purple);
+  background: var(--modal-bg), var(--purple);
 }
 
 .dialog-panel {
   padding: 28px 22px;
-  background: #2a2830;
+  background: var(--dialog-bg);
   border-radius: 28px;
 }
 
 .dialog-panel h1 {
-  color: var(--white);
+  color: var(--text);
   text-align: left;
 }
 
@@ -627,8 +695,8 @@ textarea {
   grid-template-columns: 36px 1fr 42px;
   gap: 8px;
   align-items: center;
-  background: var(--ink);
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--shell-bg);
+  border-top: 1px solid var(--line);
 }
 
 .content .composer-bar {
@@ -658,11 +726,13 @@ textarea {
   padding: 8px 12px;
   border-radius: 18px;
   background: var(--panel-2);
+  color: var(--text);
 }
 
 .message-bubble.mine {
   justify-self: end;
   background: var(--purple);
+  color: var(--text-inverse);
 }
 
 .message-bubble p {
@@ -674,8 +744,12 @@ textarea {
   display: block;
   margin-top: 3px;
   text-align: right;
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--muted);
   font-size: 11px;
+}
+
+.message-bubble.mine time {
+  color: rgba(255, 255, 255, 0.72);
 }
 
 .chat-header {
@@ -698,7 +772,7 @@ textarea {
 }
 
 .chat-header-text span {
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(255, 255, 255, 0.78);
   font-size: 12px;
 }
 
@@ -709,7 +783,7 @@ textarea {
   display: grid;
   place-items: center;
   color: var(--muted);
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--panel-2);
 }
 
 .sr-only {
