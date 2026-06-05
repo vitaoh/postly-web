@@ -64,6 +64,18 @@ public class FirebaseUsuarioDAO {
                 .map(documento -> documento.toObject(Usuario.class));
     }
 
+    public Optional<Usuario> buscarPorEmail(String email) throws ExecutionException, InterruptedException {
+        QuerySnapshot resultado = firestore.collection(COLECAO_USUARIOS)
+                .whereEqualTo("email", normalizarEmail(email))
+                .limit(1)
+                .get()
+                .get();
+
+        return resultado.getDocuments().stream()
+                .findFirst()
+                .map(documento -> documento.toObject(Usuario.class));
+    }
+
     public List<Usuario> listarPrimeiros(int limite) throws ExecutionException, InterruptedException {
         return firestore.collection(COLECAO_USUARIOS)
                 .limit(limite)
@@ -174,6 +186,10 @@ public class FirebaseUsuarioDAO {
 
     private String normalizarUsername(String username) {
         return username == null ? "" : username.trim().toLowerCase();
+    }
+
+    private String normalizarEmail(String email) {
+        return email == null ? "" : email.trim().toLowerCase();
     }
 
     private boolean estaVazio(String valor) {

@@ -15,13 +15,13 @@
   <main class="main-panel">
     <header class="page-header">
       <div>
-        <p class="page-kicker">Feed</p>
-        <h1 class="page-title">Compartilhe e acompanhe posts</h1>
-        <p class="page-subtitle">Interface web conectada ao mesmo Firestore usado pelo aplicativo mobile.</p>
+        <p class="page-kicker">Inicio</p>
+        <h1 class="page-title">Compartilhe e acompanhe publicacoes</h1>
+        <p class="page-subtitle">Veja novidades, encontre pessoas e participe das conversas do Postly.</p>
       </div>
       <div class="page-actions">
         <a class="btn outline" href="${pageContext.request.contextPath}/mensagens">Abrir mensagens</a>
-        <a class="btn" href="${pageContext.request.contextPath}/postar">Novo post</a>
+        <a class="btn" href="${pageContext.request.contextPath}/postar">Nova publicacao</a>
       </div>
     </header>
     <c:if test="${not empty erro}">
@@ -56,7 +56,7 @@
 
         <c:if test="${empty posts}">
           <section class="empty-state">
-            Nenhum post encontrado para esse filtro.
+            Nenhuma publicacao encontrada para esse filtro.
           </section>
         </c:if>
 
@@ -64,26 +64,32 @@
           <c:set var="autor" value="${usuariosPorUid[post.userId]}" />
           <article class="post-card">
             <div class="post-head">
-              <img class="avatar" src="${imagemService.src(pageContext.request.contextPath, empty autor.photo ? usuario.photo : autor.photo)}" alt="${empty autor.name ? usuario.name : autor.name}">
+              <a href="${pageContext.request.contextPath}/perfil?uid=${post.userId}">
+                <img class="avatar" src="${imagemService.src(pageContext.request.contextPath, empty autor.photo ? usuario.photo : autor.photo)}" alt="${empty autor.name ? usuario.name : autor.name}">
+              </a>
               <div class="post-author">
-                <strong>${empty autor.name ? usuario.name : autor.name}</strong>
-                <span>@${empty autor.username ? usuario.username : autor.username} &middot; ${status.index + 1} post</span>
+                <a href="${pageContext.request.contextPath}/perfil?uid=${post.userId}">
+                  <strong>${empty autor.name ? usuario.name : autor.name}</strong>
+                  <span>@${empty autor.username ? usuario.username : autor.username} &middot; publicacao ${status.index + 1}</span>
+                </a>
               </div>
               <div class="post-actions">
                 <c:if test="${post.userId == usuario.uid}">
-                  <a class="icon-link outline" href="${pageContext.request.contextPath}/editar-post?id=${post.id}" aria-label="Editar post">Editar</a>
+                  <a class="icon-link outline" href="${pageContext.request.contextPath}/editar-post?id=${post.id}" aria-label="Editar publicacao">Editar</a>
                   <form class="inline-form" action="${pageContext.request.contextPath}/post" method="post">
                     <input type="hidden" name="action" value="delete-post">
                     <input type="hidden" name="postId" value="${post.id}">
-                    <button class="icon-button danger" type="submit" aria-label="Excluir post">Excluir</button>
+                    <button class="icon-button danger" type="submit" aria-label="Excluir publicacao">Excluir</button>
                   </form>
                 </c:if>
               </div>
             </div>
-            <p class="post-text">${post.description}</p>
+            <a class="post-open" href="${pageContext.request.contextPath}/post?id=${post.id}" aria-label="Abrir publicacao">
+              <p class="post-text">${post.description}</p>
+            </a>
             <c:if test="${not empty post.image}">
               <a href="${pageContext.request.contextPath}/post?id=${post.id}">
-                <img class="post-image" src="${imagemService.src(pageContext.request.contextPath, post.image)}" alt="Midia do post">
+                <img class="post-image" src="${imagemService.src(pageContext.request.contextPath, post.image)}" alt="Midia da publicacao">
               </a>
             </c:if>
             <div class="post-metrics">
@@ -106,19 +112,18 @@
             <p class="muted">@${usuario.username}</p>
           </div>
           <div class="stats">
-            <div class="stat"><strong>${postsCount}</strong><span>Posts</span></div>
-            <div class="stat"><strong>${comentariosCount}</strong><span>Comentarios</span></div>
+            <div class="stat"><strong>${usuarioPostsCount}</strong><span>Publicacoes</span></div>
+            <div class="stat"><strong>${usuarioComentariosCount}</strong><span>Comentarios</span></div>
             <div class="stat"><strong>${conversasCount}</strong><span>Conversas</span></div>
           </div>
         </section>
 
         <section class="content-card">
-          <h2 class="section-title">Status do Firestore</h2>
-          <p class="page-subtitle">${firebaseStatus}</p>
-          <div class="stats">
-            <div class="stat"><strong>${usuariosCount}</strong><span>Usuarios</span></div>
-            <div class="stat"><strong>${postsCount}</strong><span>Posts</span></div>
-            <div class="stat"><strong>${conversasCount}</strong><span>Chats</span></div>
+          <h2 class="section-title">Atalhos rapidos</h2>
+          <div class="quick-actions">
+            <a class="btn full" href="${pageContext.request.contextPath}/postar">Criar publicacao</a>
+            <a class="btn outline full" href="${pageContext.request.contextPath}/mensagens">Abrir mensagens</a>
+            <a class="btn outline full" href="${pageContext.request.contextPath}/configuracoes">Editar perfil</a>
           </div>
         </section>
       </aside>

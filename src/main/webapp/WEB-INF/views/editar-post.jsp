@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Editar post - Postly</title>
+  <title>Editar publicacao - Postly</title>
   <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/postly.css">
 </head>
 <body>
@@ -16,7 +16,7 @@
     <header class="page-header">
       <div>
         <p class="page-kicker">Edicao</p>
-        <h1 class="page-title">Editar post</h1>
+        <h1 class="page-title">Editar publicacao</h1>
         <p class="page-subtitle">Ajuste descricao, imagem ou localizacao da publicacao.</p>
       </div>
       <div class="page-actions">
@@ -34,7 +34,7 @@
           <label for="description">Descricao</label>
           <textarea class="textarea" id="description" name="description" required>${postPrincipal.description}</textarea>
           <c:if test="${not empty postPrincipal.image}">
-            <img class="post-image" src="${imagemService.src(pageContext.request.contextPath, postPrincipal.image)}" alt="Midia atual do post">
+            <img class="post-image" src="${imagemService.src(pageContext.request.contextPath, postPrincipal.image)}" alt="Midia atual da publicacao">
           </c:if>
           <label>Trocar imagem
             <input class="field" name="imageFile" type="file" accept="image/*">

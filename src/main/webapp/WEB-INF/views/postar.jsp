@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Novo post - Postly</title>
+  <title>Nova publicacao - Postly</title>
   <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/postly.css">
 </head>
 <body>
@@ -16,8 +16,8 @@
     <header class="page-header">
       <div>
         <p class="page-kicker">Criacao</p>
-        <h1 class="page-title">Novo post</h1>
-        <p class="page-subtitle">Publique texto, imagem e localizacao no mesmo formato usado pelo app mobile.</p>
+        <h1 class="page-title">Nova publicacao</h1>
+        <p class="page-subtitle">Conte o que aconteceu, adicione uma imagem e ajude outras pessoas a encontrarem sua publicacao.</p>
       </div>
       <div class="page-actions">
         <a class="btn outline" href="${pageContext.request.contextPath}/home">&larr; Cancelar</a>
@@ -47,8 +47,12 @@
       </section>
 
       <aside class="content-card">
-        <h2 class="section-title">Firestore</h2>
-        <p class="page-subtitle">${firebaseStatus}</p>
+        <h2 class="section-title">Dicas para publicar</h2>
+        <div class="tips-list">
+          <p>Use uma descricao clara e direta.</p>
+          <p>Adicione uma imagem quando ela ajudar a contar melhor o momento.</p>
+          <p>Informe a localizacao apenas quando fizer sentido para a publicacao.</p>
+        </div>
       </aside>
     </section>
   </main>

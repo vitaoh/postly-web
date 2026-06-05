@@ -159,6 +159,12 @@ public class FirebaseChatDAO {
     }
 
     private long lastTimestamp(ChatThread chat) {
-        return chat.getLastTimestamp() == null ? 0L : chat.getLastTimestamp();
+        if (chat.getLastTimestamp() != null && chat.getLastTimestamp() > 0L) {
+            return chat.getLastTimestamp();
+        }
+        if (chat.getUpdatedAt() != null && chat.getUpdatedAt() > 0L) {
+            return chat.getUpdatedAt();
+        }
+        return chat.getCreatedAt() == null ? 0L : chat.getCreatedAt();
     }
 }

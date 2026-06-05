@@ -19,6 +19,7 @@ public class ImagemBase64Service {
 
     private static final int MAX_DIMENSION = 800;
     private static final float JPEG_QUALITY = 0.70f;
+    private static final String AVATAR_PADRAO = "assets/img/avatar-demo.svg";
 
     public String partParaBase64(Part part) throws IOException {
         if (part == null || part.getSize() == 0) {
@@ -49,12 +50,17 @@ public class ImagemBase64Service {
     public String src(String contextPath, String valor) {
         String src = paraDataUri(valor);
         if (src == null) {
-            return "";
+            return caminhoAsset(contextPath, AVATAR_PADRAO);
         }
         if (src.startsWith("assets/")) {
-            return contextPath + "/" + src;
+            return caminhoAsset(contextPath, src);
         }
         return src;
+    }
+
+    private String caminhoAsset(String contextPath, String asset) {
+        String base = contextPath == null ? "" : contextPath;
+        return base + "/" + asset;
     }
 
     private BufferedImage reduzir(BufferedImage imagem) {

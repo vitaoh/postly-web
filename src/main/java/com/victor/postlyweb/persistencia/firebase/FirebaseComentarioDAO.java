@@ -57,6 +57,27 @@ public class FirebaseComentarioDAO {
                 .collect(Collectors.toList());
     }
 
+    public int contarPorUsuario(String userId) throws ExecutionException, InterruptedException {
+        if (userId == null || userId.trim().isEmpty()) {
+            return 0;
+        }
+
+        int total = 0;
+        List<? extends DocumentSnapshot> posts = firestore.collection(COLECAO_POSTS)
+                .get()
+                .get()
+                .getDocuments();
+        for (DocumentSnapshot post : posts) {
+            total += post.getReference()
+                    .collection(SUBCOLECAO_COMMENTS)
+                    .whereEqualTo("userId", userId)
+                    .get()
+                    .get()
+                    .size();
+        }
+        return total;
+    }
+
     public Optional<Comentario> buscarPorId(String postId, String comentarioId)
             throws ExecutionException, InterruptedException {
         DocumentSnapshot snapshot = firestore.collection(COLECAO_POSTS)

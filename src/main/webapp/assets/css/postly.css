@@ -1,6 +1,7 @@
 :root {
   color-scheme: light;
   --primary: #9539CB;
+  --logo-bg: #9539CB;
   --primary-strong: #7b2fb0;
   --primary-soft: #f1e4f8;
   --accent: #2563eb;
@@ -86,7 +87,7 @@ button {
 }
 
 .app-layout {
-  width: min(1440px, 100%);
+  width: 100%;
   min-height: 100vh;
   margin: 0 auto;
   display: grid;
@@ -94,29 +95,43 @@ button {
 }
 
 .sidebar {
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
+  max-height: 100vh;
+  max-height: 100dvh;
   padding: 28px 20px;
   position: sticky;
   top: 0;
+  align-self: start;
   display: flex;
   flex-direction: column;
   gap: 22px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
   background: var(--surface);
   border-right: 1px solid var(--border);
 }
 
 .brand {
+  padding: 10px 14px;
+  border-radius: var(--radius);
   display: flex;
   align-items: center;
   gap: 12px;
+  background: var(--logo-bg);
+  color: var(--inverse);
   font-size: 24px;
   font-weight: 850;
+  box-shadow: 0 12px 28px rgba(149, 57, 203, 0.22);
 }
 
 .brand img {
-  width: 44px;
-  height: 44px;
+  width: 36px;
+  height: 36px;
   object-fit: contain;
+  border-radius: 0;
+  background: transparent;
 }
 
 .side-nav {
@@ -135,48 +150,15 @@ button {
 }
 
 .side-nav a:hover,
-.side-nav a:focus-visible {
+.side-nav a:focus-visible,
+.side-nav a.active {
   background: var(--primary-soft);
   color: var(--primary-strong);
   outline: none;
 }
 
-.status-card {
-  margin-top: auto;
-  padding: 14px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  display: grid;
-  grid-template-columns: 12px 1fr;
-  gap: 10px;
-  background: var(--surface-2);
-}
-
-.status-card strong {
-  display: block;
-  font-size: 13px;
-}
-
-.status-card p {
-  margin: 3px 0 0;
-  color: var(--text-muted);
-  font-size: 12px;
-  line-height: 1.35;
-}
-
-.status-dot {
-  width: 10px;
-  height: 10px;
-  margin-top: 3px;
-  border-radius: 50%;
-  background: var(--danger);
-}
-
-.status-card.online .status-dot {
-  background: var(--success);
-}
-
 .sidebar-user {
+  margin-top: auto;
   padding: 12px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -380,6 +362,10 @@ button {
   line-height: 1.55;
 }
 
+.post-open {
+  display: block;
+}
+
 .post-image {
   width: 100%;
   max-height: 520px;
@@ -503,16 +489,16 @@ button {
 }
 
 .password-field .field {
-  padding-right: 48px;
+  padding-right: 96px;
 }
 
 .password-toggle {
-  width: 38px;
-  height: 38px;
+  min-width: 76px;
+  height: 32px;
   border: 0;
   border-radius: var(--radius);
   position: absolute;
-  right: 5px;
+  right: 8px;
   top: 50%;
   transform: translateY(-50%);
   background: transparent;
@@ -561,6 +547,46 @@ button {
   border-top: 1px solid var(--border);
   display: grid;
   gap: 12px;
+}
+
+.quick-actions,
+.tips-list {
+  display: grid;
+  gap: 10px;
+}
+
+.tips-list p {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  color: var(--text-soft);
+  line-height: 1.4;
+}
+
+.google-profile-preview {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 12px;
+  align-items: center;
+  background: var(--surface-2);
+}
+
+.google-profile-preview .avatar.large {
+  width: 64px;
+  height: 64px;
+}
+
+.google-profile-preview strong,
+.google-profile-preview small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .stats {
@@ -619,6 +645,10 @@ button {
   gap: 24px;
 }
 
+.messages-shell-single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .conversation,
 .comment {
   padding: 14px;
@@ -636,6 +666,11 @@ button {
   margin: 4px 0 0;
   color: var(--text-soft);
   line-height: 1.4;
+}
+
+.conversation small {
+  display: block;
+  margin-top: 2px;
 }
 
 .messages-list,
@@ -713,12 +748,14 @@ button {
   padding: 56px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 46px;
   background: var(--primary);
   color: var(--inverse);
 }
 
 .auth-brand {
+  align-self: flex-start;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -762,6 +799,11 @@ button {
   font-size: 28px;
 }
 
+.auth-back-link {
+  justify-self: center;
+  text-align: center;
+}
+
 .settings-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 320px;
@@ -794,9 +836,12 @@ button {
 
   .sidebar {
     min-height: auto;
+    height: auto;
+    max-height: none;
     position: static;
     flex-direction: row;
     align-items: center;
+    overflow-y: visible;
     overflow-x: auto;
   }
 
@@ -805,7 +850,6 @@ button {
     min-width: max-content;
   }
 
-  .status-card,
   .sidebar-user {
     display: none;
   }

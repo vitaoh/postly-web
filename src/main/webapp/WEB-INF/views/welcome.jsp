@@ -15,16 +15,16 @@
       <span>Postly</span>
     </a>
     <div>
-      <h1>Share your moments.</h1>
-      <p>Uma experiencia web para acompanhar o mesmo conteudo publicado no aplicativo mobile.</p>
+      <h1>Compartilhe seus momentos.</h1>
+      <p>Publique ideias, acompanhe perfis e converse com pessoas em uma experiencia simples e direta.</p>
     </div>
-    <p>${firebaseStatus}</p>
   </section>
 
   <section class="auth-panel">
     <div class="auth-card">
       <h1>Bem-vindo ao Postly</h1>
       <p class="page-subtitle">Entre na sua conta ou crie um perfil para publicar e conversar.</p>
+      <br>
       <div class="form-stack">
         <a class="btn full" href="${pageContext.request.contextPath}/entrar">Entrar</a>
         <a class="btn outline full" href="${pageContext.request.contextPath}/criar-conta">Criar conta</a>

@@ -17,6 +17,7 @@ import com.victor.postlyweb.service.PostlyComentarioService;
 import com.victor.postlyweb.service.PostlyDemoService;
 import com.victor.postlyweb.service.PostlyPostService;
 import com.victor.postlyweb.service.PostlyUsuarioService;
+import com.victor.postlyweb.service.TempoService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,6 +45,7 @@ public class PostlyPageController extends HttpServlet {
 
     private final PostlyDemoService demoService = new PostlyDemoService();
     private final ImagemBase64Service imagemService = new ImagemBase64Service();
+    private final TempoService tempoService = new TempoService();
     private final PostlyAuthService authService = new PostlyAuthService();
 
     @Override
@@ -79,6 +81,7 @@ public class PostlyPageController extends HttpServlet {
             switch (path) {
                 case "/auth/resolve-username" -> resolverUsername(request, response);
                 case "/auth/check-username" -> verificarUsername(request, response);
+                case "/auth/check-account" -> verificarConta(request, response);
                 case "/auth/session" -> abrirSessao(request, response);
                 case "/auth/register" -> registrarUsuario(request, response);
                 case "/auth/google-complete" -> completarUsuarioGoogle(request, response);
@@ -86,6 +89,7 @@ public class PostlyPageController extends HttpServlet {
                 case "/postar" -> criarPost(request, response);
                 case "/editar-post" -> editarPost(request, response);
                 case "/post" -> acaoPost(request, response);
+                case "/perfil" -> acaoPerfil(request, response);
                 case "/chat" -> enviarMensagem(request, response);
                 case "/configuracoes" -> salvarPerfil(request, response);
                 case "/mudar-senha" -> senhaSemJavascript(request, response);
@@ -101,16 +105,17 @@ public class PostlyPageController extends HttpServlet {
 
     private boolean carregarDadosComuns(HttpServletRequest request, boolean permitirDemo) {
         request.setAttribute("imagemService", imagemService);
+        request.setAttribute("tempoService", tempoService);
         try {
             carregarDadosFirebase(request);
             return true;
         } catch (Exception exception) {
             if (!permitirDemo) {
-                adicionarFlash(request, FLASH_ERRO, "Nao foi possivel carregar seus dados do Firestore: "
+                adicionarFlash(request, FLASH_ERRO, "Nao foi possivel carregar seus dados agora: "
                         + mensagemCurta(exception));
                 return false;
             }
-            carregarDadosDemo(request, "Modo demo: " + mensagemCurta(exception));
+            carregarDadosDemo(request);
             return true;
         }
     }
@@ -124,15 +129,18 @@ public class PostlyPageController extends HttpServlet {
         String uidSessao = usuarioAutenticadoUid(request);
         List<Usuario> usuarios = usuarioDAO.listarPrimeiros(30);
         Usuario usuarioAtual = usuarioAtual(usuarioDAO, usuarios, uidSessao);
+        Usuario perfilUsuario = perfilUsuario(usuarioDAO, usuarioAtual, param(request, "uid"));
 
         String busca = param(request, "busca");
         String feedAtivo = feedAtivo(request);
-        List<Post> posts = carregarPostsDaTela(request, usuarioDAO, postDAO, usuarioAtual.getUid(), feedAtivo);
+        List<Post> posts = carregarPostsDaTela(request, usuarioDAO, postDAO, usuarioAtual.getUid(),
+                perfilUsuario.getUid(), feedAtivo);
 
         List<ChatThread> conversas = estaVazio(uidSessao) ? List.of() : chatDAO.listarConversas(uidSessao);
-        ChatThread chatAtual = chatAtual(chatDAO, conversas, param(request, "chatId"), uidSessao);
+        ChatThread chatAtual = chatAtual(chatDAO, conversas, param(request, "chatId"), param(request, "otherUid"), uidSessao);
         List<ChatMessage> mensagens = chatAtual == null ? List.of() : chatDAO.listarMensagens(chatAtual.getId());
         Usuario outroUsuario = outroUsuario(usuarioDAO, usuarios, usuarioAtual, conversas, chatAtual, param(request, "otherUid"));
+        Map<String, Usuario> usuariosPorConversa = usuariosPorConversa(usuarioDAO, usuarios, usuarioAtual, conversas);
 
         Map<String, Usuario> usuariosPorUid = usuariosPorUid(usuarioDAO, usuarios, usuarioAtual, outroUsuario, posts, List.of());
         posts = filtrarPosts(posts, busca, usuariosPorUid);
@@ -143,9 +151,18 @@ public class PostlyPageController extends HttpServlet {
                 ? List.of()
                 : comentarioDAO.listarPorPost(postPrincipal.getId());
         usuariosPorUid = usuariosPorUid(usuarioDAO, usuarios, usuarioAtual, outroUsuario, posts, comentarios);
+        int usuarioPostsCount = postDAO.listarPorUsuario(usuarioAtual.getUid()).size();
+        int usuarioComentariosCount = comentarioDAO.contarPorUsuario(usuarioAtual.getUid());
 
         request.setAttribute("usuario", usuarioAtual);
+        request.setAttribute("perfil", perfilUsuario);
+        request.setAttribute("perfilEhAtual", perfilUsuario.getUid().equals(usuarioAtual.getUid()));
+        request.setAttribute("perfilSeguidoresCount", usuarioDAO.contarSeguidores(perfilUsuario.getUid()));
+        request.setAttribute("perfilSeguindoCount", usuarioDAO.contarSeguindo(perfilUsuario.getUid()));
+        request.setAttribute("perfilSeguidoPeloAtual", !perfilUsuario.getUid().equals(usuarioAtual.getUid())
+                && usuarioDAO.estaSeguindo(usuarioAtual.getUid(), perfilUsuario.getUid()));
         request.setAttribute("outroUsuario", outroUsuario);
+        request.setAttribute("usuariosPorConversa", usuariosPorConversa);
         request.setAttribute("usuariosPorUid", usuariosPorUid);
         request.setAttribute("posts", posts);
         request.setAttribute("postPrincipal", postPrincipal);
@@ -153,8 +170,6 @@ public class PostlyPageController extends HttpServlet {
         request.setAttribute("conversas", conversas);
         request.setAttribute("chatAtual", chatAtual);
         request.setAttribute("mensagens", mensagens);
-        request.setAttribute("firebaseOnline", true);
-        request.setAttribute("firebaseStatus", "Firestore conectado");
         request.setAttribute("autenticado", !estaVazio(uidSessao));
         request.setAttribute("busca", busca);
         request.setAttribute("feedAtivo", feedAtivo);
@@ -162,6 +177,8 @@ public class PostlyPageController extends HttpServlet {
         request.setAttribute("postsCount", posts.size());
         request.setAttribute("comentariosCount", comentarios.size());
         request.setAttribute("conversasCount", conversas.size());
+        request.setAttribute("usuarioPostsCount", usuarioPostsCount);
+        request.setAttribute("usuarioComentariosCount", usuarioComentariosCount);
     }
 
     private Usuario usuarioAtual(FirebaseUsuarioDAO usuarioDAO, List<Usuario> usuarios, String uidSessao)
@@ -174,11 +191,21 @@ public class PostlyPageController extends HttpServlet {
         return usuarios.stream().findFirst().orElse(demoService.usuarioAtual());
     }
 
+    private Usuario perfilUsuario(FirebaseUsuarioDAO usuarioDAO, Usuario usuarioAtual, String perfilUid) throws Exception {
+        if (estaVazio(perfilUid) || perfilUid.equals(usuarioAtual.getUid())) {
+            return usuarioAtual;
+        }
+
+        return usuarioDAO.buscarPorUid(perfilUid)
+                .orElseThrow(() -> new IllegalArgumentException("Perfil nao encontrado."));
+    }
+
     private List<Post> carregarPostsDaTela(HttpServletRequest request, FirebaseUsuarioDAO usuarioDAO,
-                                           FirebasePostDAO postDAO, String usuarioAtualUid, String feedAtivo)
+                                           FirebasePostDAO postDAO, String usuarioAtualUid, String perfilUid,
+                                           String feedAtivo)
             throws Exception {
-        if ("/perfil".equals(request.getServletPath()) && !estaVazio(usuarioAtualUid)) {
-            return postDAO.listarPorUsuario(usuarioAtualUid);
+        if ("/perfil".equals(request.getServletPath()) && !estaVazio(perfilUid)) {
+            return postDAO.listarPorUsuario(perfilUid);
         }
         if ("following".equals(feedAtivo)) {
             List<String> seguindo = usuarioDAO.listarSeguindoIds(usuarioAtualUid);
@@ -225,13 +252,17 @@ public class PostlyPageController extends HttpServlet {
         return posts.stream().findFirst().orElse(null);
     }
 
-    private ChatThread chatAtual(FirebaseChatDAO chatDAO, List<ChatThread> conversas, String chatId, String uidSessao)
+    private ChatThread chatAtual(FirebaseChatDAO chatDAO, List<ChatThread> conversas, String chatId,
+                                 String otherUid, String uidSessao)
             throws Exception {
         if (!estaVazio(chatId)) {
             Optional<ChatThread> chat = chatDAO.buscarPorId(chatId);
             if (chat.isPresent() && chat.get().getParticipants().contains(uidSessao)) {
                 return chat.get();
             }
+        }
+        if (!estaVazio(otherUid) && !estaVazio(uidSessao) && !otherUid.equals(uidSessao)) {
+            return chatDAO.criarOuBuscarChat(uidSessao, otherUid);
         }
 
         return conversas.stream().findFirst().orElse(null);
@@ -287,19 +318,72 @@ public class PostlyPageController extends HttpServlet {
         return mapa;
     }
 
+    private Map<String, Usuario> usuariosPorConversa(FirebaseUsuarioDAO usuarioDAO, List<Usuario> usuarios,
+                                                     Usuario usuarioAtual, List<ChatThread> conversas) throws Exception {
+        Map<String, Usuario> mapa = new HashMap<>();
+        Map<String, Usuario> cache = new HashMap<>();
+        adicionarUsuario(cache, usuarioAtual);
+        for (Usuario usuario : usuarios) {
+            adicionarUsuario(cache, usuario);
+        }
+
+        for (ChatThread conversa : conversas) {
+            String uidOutroParticipante = outroParticipante(conversa, usuarioAtual.getUid());
+            if (estaVazio(uidOutroParticipante) || estaVazio(conversa.getId())) {
+                continue;
+            }
+
+            Usuario usuarioConversa = cache.get(uidOutroParticipante);
+            if (usuarioConversa == null) {
+                Optional<Usuario> usuarioEncontrado = usuarioDAO.buscarPorUid(uidOutroParticipante);
+                if (usuarioEncontrado.isPresent()) {
+                    usuarioConversa = usuarioEncontrado.get();
+                    adicionarUsuario(cache, usuarioConversa);
+                }
+            }
+            adicionarUsuarioPorConversa(mapa, conversa.getId(), usuarioConversa);
+        }
+        return mapa;
+    }
+
+    private String outroParticipante(ChatThread conversa, String usuarioAtualUid) {
+        if (conversa == null || conversa.getParticipants() == null) {
+            return "";
+        }
+        return conversa.getParticipants()
+                .stream()
+                .filter(participante -> participante != null && !participante.equals(usuarioAtualUid))
+                .findFirst()
+                .orElse("");
+    }
+
+    private void adicionarUsuarioPorConversa(Map<String, Usuario> mapa, String conversaId, Usuario usuario) {
+        if (!estaVazio(conversaId) && usuario != null) {
+            mapa.put(conversaId, usuario);
+        }
+    }
+
     private void adicionarUsuario(Map<String, Usuario> mapa, Usuario usuario) {
         if (usuario != null && !estaVazio(usuario.getUid())) {
             mapa.put(usuario.getUid(), usuario);
         }
     }
 
-    private void carregarDadosDemo(HttpServletRequest request, String status) {
+    private void carregarDadosDemo(HttpServletRequest request) {
         Map<String, Usuario> usuariosPorUid = new HashMap<>();
+        Map<String, Usuario> usuariosPorConversa = new HashMap<>();
         adicionarUsuario(usuariosPorUid, demoService.usuarioAtual());
         adicionarUsuario(usuariosPorUid, demoService.outroUsuario());
+        adicionarUsuarioPorConversa(usuariosPorConversa, demoService.conversas().get(0).getId(), demoService.outroUsuario());
 
         request.setAttribute("usuario", demoService.usuarioAtual());
+        request.setAttribute("perfil", demoService.usuarioAtual());
+        request.setAttribute("perfilEhAtual", true);
+        request.setAttribute("perfilSeguidoresCount", 1);
+        request.setAttribute("perfilSeguindoCount", 1);
+        request.setAttribute("perfilSeguidoPeloAtual", false);
         request.setAttribute("outroUsuario", demoService.outroUsuario());
+        request.setAttribute("usuariosPorConversa", usuariosPorConversa);
         request.setAttribute("usuariosPorUid", usuariosPorUid);
         request.setAttribute("posts", demoService.posts());
         request.setAttribute("postPrincipal", demoService.posts().get(0));
@@ -307,13 +391,13 @@ public class PostlyPageController extends HttpServlet {
         request.setAttribute("conversas", demoService.conversas());
         request.setAttribute("chatAtual", demoService.conversas().get(0));
         request.setAttribute("mensagens", demoService.mensagens());
-        request.setAttribute("firebaseOnline", false);
-        request.setAttribute("firebaseStatus", status);
         request.setAttribute("autenticado", false);
         request.setAttribute("usuariosCount", 0);
         request.setAttribute("postsCount", demoService.posts().size());
         request.setAttribute("comentariosCount", demoService.comentarios().size());
         request.setAttribute("conversasCount", demoService.conversas().size());
+        request.setAttribute("usuarioPostsCount", demoService.posts().size());
+        request.setAttribute("usuarioComentariosCount", demoService.comentarios().size());
     }
 
     private void resolverUsername(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -339,6 +423,31 @@ public class PostlyPageController extends HttpServlet {
                 "error", disponivel ? "" : "Nome de usuario ja esta em uso."));
     }
 
+    private void verificarConta(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String username = normalizarUsername(param(request, "username"));
+        String email = normalizarEmail(param(request, "email"));
+        PostlyUsuarioService usuarioService = new PostlyUsuarioService();
+
+        if (username.length() < 3) {
+            responderJson(response, false, Map.of("error", "Nome de usuario deve ter pelo menos 3 caracteres."));
+            return;
+        }
+        if (estaVazio(email) || !email.contains("@")) {
+            responderJson(response, false, Map.of("error", "Informe um e-mail valido."));
+            return;
+        }
+        if (usuarioService.buscarPorUsername(username).isPresent()) {
+            responderJson(response, false, Map.of("error", "Nome de usuario ja esta em uso."));
+            return;
+        }
+        if (usuarioService.buscarPorEmail(email).isPresent()) {
+            responderJson(response, false, Map.of("error", "E-mail ja esta em uso."));
+            return;
+        }
+
+        responderJson(response, true, Map.of("available", "true"));
+    }
+
     private void abrirSessao(HttpServletRequest request, HttpServletResponse response) throws Exception {
         FirebaseToken token = authService.verificarToken(param(request, "idToken"));
         Optional<Usuario> usuario = new PostlyUsuarioService().buscarPorUid(token.getUid());
@@ -347,7 +456,8 @@ public class PostlyPageController extends HttpServlet {
                     "needsProfile", "true",
                     "suggestedUsername", sugerirUsername(emailDoToken(token), nomeDoToken(token)),
                     "name", valorOuVazio(nomeDoToken(token)),
-                    "email", valorOuVazio(emailDoToken(token))
+                    "email", valorOuVazio(emailDoToken(token)),
+                    "photo", valorOuVazio(imagemDoToken(token))
             ));
             return;
         }
@@ -363,7 +473,7 @@ public class PostlyPageController extends HttpServlet {
         String email = valorOuPadrao(emailDoToken(token), param(request, "email"), "");
 
         Usuario usuario = new Usuario(token.getUid(), name, username, email, imagemDoToken(token));
-        Usuario salvo = new PostlyUsuarioService().salvarComUsernameUnico(usuario);
+        Usuario salvo = new PostlyUsuarioService().salvarComUsernameEEmailUnicos(usuario);
         definirSessao(request, salvo);
         responderJson(response, true, Map.of("redirect", request.getContextPath() + "/home"));
     }
@@ -375,7 +485,7 @@ public class PostlyPageController extends HttpServlet {
         String email = valorOuPadrao(emailDoToken(token), param(request, "email"), "");
 
         Usuario usuario = new Usuario(token.getUid(), name, username, email, imagemDoToken(token));
-        Usuario salvo = new PostlyUsuarioService().salvarComUsernameUnico(usuario);
+        Usuario salvo = new PostlyUsuarioService().salvarComUsernameEEmailUnicos(usuario);
         definirSessao(request, salvo);
         responderJson(response, true, Map.of("redirect", request.getContextPath() + "/home"));
     }
@@ -396,7 +506,7 @@ public class PostlyPageController extends HttpServlet {
         new PostlyPostService().salvarNovoPost(uid, param(request, "description"), imagem,
                 latitude, longitude, param(request, "locationName"));
 
-        adicionarFlash(request, FLASH_MENSAGEM, "Post publicado no Firestore.");
+        adicionarFlash(request, FLASH_MENSAGEM, "Publicacao salva.");
         response.sendRedirect(request.getContextPath() + "/home");
     }
 
@@ -405,7 +515,7 @@ public class PostlyPageController extends HttpServlet {
         String postId = param(request, "postId");
         PostlyPostService postService = new PostlyPostService();
         Post atual = postService.buscarPost(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Post nao encontrado."));
+                .orElseThrow(() -> new IllegalArgumentException("Publicacao nao encontrada."));
 
         String imagem = imagemUpload(request, "imageFile");
         Post atualizado = new Post();
@@ -417,7 +527,7 @@ public class PostlyPageController extends HttpServlet {
         atualizado.setLocationName(param(request, "locationName"));
 
         postService.atualizarPost(uid, atualizado);
-        adicionarFlash(request, FLASH_MENSAGEM, "Post atualizado.");
+        adicionarFlash(request, FLASH_MENSAGEM, "Publicacao atualizada.");
         response.sendRedirect(request.getContextPath() + "/post?id=" + encode(postId));
     }
 
@@ -443,11 +553,25 @@ public class PostlyPageController extends HttpServlet {
             }
             case "delete-post" -> {
                 new PostlyPostService().excluirPost(postId, uid);
-                adicionarFlash(request, FLASH_MENSAGEM, "Post excluido.");
+                adicionarFlash(request, FLASH_MENSAGEM, "Publicacao excluida.");
                 response.sendRedirect(request.getContextPath() + "/home");
             }
-            default -> throw new IllegalArgumentException("Acao de post invalida.");
+            default -> throw new IllegalArgumentException("Acao de publicacao invalida.");
         }
+    }
+
+    private void acaoPerfil(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String uid = uidObrigatorio(request);
+        String alvoUid = param(request, "uid");
+        String action = param(request, "action");
+
+        if ("toggle-follow".equals(action)) {
+            new PostlyUsuarioService().alternarSeguir(uid, alvoUid);
+            response.sendRedirect(request.getContextPath() + "/perfil?uid=" + encode(alvoUid));
+            return;
+        }
+
+        throw new IllegalArgumentException("Acao de perfil invalida.");
     }
 
     private void enviarMensagem(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -472,13 +596,13 @@ public class PostlyPageController extends HttpServlet {
         usuario.setPhoto(estaVazio(novaFoto) ? atual.getPhoto() : novaFoto);
 
         usuarioService.salvarComUsernameUnico(usuario);
-        adicionarFlash(request, FLASH_MENSAGEM, "Perfil salvo no Firestore.");
+        adicionarFlash(request, FLASH_MENSAGEM, "Perfil salvo.");
         response.sendRedirect(request.getContextPath() + "/perfil");
     }
 
     private void senhaSemJavascript(HttpServletRequest request, HttpServletResponse response) throws IOException {
         adicionarFlash(request, FLASH_ERRO,
-                "Para alterar senha, use a tela com JavaScript do Firebase Auth carregado. O servidor nao valida senha atual pelo Admin SDK.");
+                "Para alterar a senha, use a confirmacao da tela e tente novamente se a sessao tiver expirado.");
         response.sendRedirect(request.getContextPath() + "/mudar-senha");
     }
 
@@ -578,6 +702,10 @@ public class PostlyPageController extends HttpServlet {
     private String normalizarUsername(String username) {
         String limpo = username == null ? "" : username.trim().toLowerCase();
         return limpo.startsWith("@") ? limpo.substring(1) : limpo;
+    }
+
+    private String normalizarEmail(String email) {
+        return email == null ? "" : email.trim().toLowerCase();
     }
 
     private boolean estaVazio(String valor) {

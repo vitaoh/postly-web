@@ -17,7 +17,7 @@
       <div>
         <p class="page-kicker">Conta</p>
         <h1 class="page-title">Configuracoes do perfil</h1>
-        <p class="page-subtitle">Atualize os dados publicos que tambem aparecem no app mobile.</p>
+        <p class="page-subtitle">Atualize os dados publicos que tambem aparecem no aplicativo para celular.</p>
       </div>
       <div class="page-actions">
         <a class="btn outline" href="${pageContext.request.contextPath}/perfil">&larr; Perfil</a>
@@ -59,8 +59,8 @@
           <a class="text-link" href="#">Alterar foto</a>
         </div>
         <div class="stats">
-          <div class="stat"><strong>${postsCount}</strong><span>Posts</span></div>
-          <div class="stat"><strong>${comentariosCount}</strong><span>Comentarios</span></div>
+          <div class="stat"><strong>${usuarioPostsCount}</strong><span>Publicacoes</span></div>
+          <div class="stat"><strong>${usuarioComentariosCount}</strong><span>Comentarios</span></div>
           <div class="stat"><strong>${conversasCount}</strong><span>Conversas</span></div>
         </div>
       </aside>

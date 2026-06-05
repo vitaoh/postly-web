@@ -71,6 +71,10 @@
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>PostlyPageController</servlet-name>
+    <url-pattern>/auth/check-account</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>PostlyPageController</servlet-name>
     <url-pattern>/auth/session</url-pattern>
   </servlet-mapping>
   <servlet-mapping>

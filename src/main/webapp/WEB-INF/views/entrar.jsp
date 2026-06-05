@@ -17,9 +17,8 @@
     </a>
     <div>
       <h1>Entre e continue de onde parou.</h1>
-      <p>Posts, comentarios e conversas usam a mesma estrutura do Firestore do app mobile.</p>
+      <p>Acesse suas publicacoes, mensagens e perfil em uma experiencia organizada para desktop.</p>
     </div>
-    <p>${firebaseStatus}</p>
   </section>
 
   <section class="auth-panel">
@@ -46,6 +45,13 @@
 
         <section class="profile-complete" data-google-profile hidden>
           <h2>Completar perfil</h2>
+          <div class="google-profile-preview">
+            <img class="avatar large" data-google-photo src="${pageContext.request.contextPath}/assets/img/avatar-demo.svg" alt="">
+            <span>
+              <strong data-google-name>Conta Google</strong>
+              <small class="muted" data-google-email></small>
+            </span>
+          </div>
           <input class="field" name="googleName" placeholder="Nome">
           <input class="field" name="googleUsername" placeholder="Usuario">
           <button class="btn full" type="button" data-complete-google>Salvar e entrar</button>
@@ -55,6 +61,8 @@
   </section>
 </main>
 <script src="${pageContext.request.contextPath}/assets/js/postly.js"></script>
-<script type="module" src="${pageContext.request.contextPath}/assets/js/postly-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/postly-auth.js"></script>
 </body>
 </html>

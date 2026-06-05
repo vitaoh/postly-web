@@ -17,7 +17,7 @@
       <div>
         <p class="page-kicker">Seguranca</p>
         <h1 class="page-title">Alterar senha</h1>
-        <p class="page-subtitle">Use pelo menos 6 caracteres para manter compatibilidade com Firebase Auth.</p>
+        <p class="page-subtitle">Use uma senha com pelo menos 6 caracteres e confirme antes de salvar.</p>
       </div>
       <div class="page-actions">
         <a class="btn outline" href="${pageContext.request.contextPath}/configuracoes">&larr; Configuracoes</a>
@@ -57,13 +57,19 @@
       </section>
 
       <aside class="content-card">
-        <h2 class="section-title">Firebase Auth</h2>
-        <p class="page-subtitle">A camada Java esta preparada para atualizar senha via Admin SDK quando o usuario autenticado estiver definido.</p>
+        <h2 class="section-title">Seguranca da conta</h2>
+        <div class="tips-list">
+          <p>Evite reutilizar senhas antigas.</p>
+          <p>Combine letras, numeros e caracteres especiais.</p>
+          <p>Depois de alterar, entre novamente se a sessao expirar.</p>
+        </div>
       </aside>
     </section>
   </main>
 </div>
 <script src="${pageContext.request.contextPath}/assets/js/postly.js"></script>
-<script type="module" src="${pageContext.request.contextPath}/assets/js/postly-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/postly-auth.js"></script>
 </body>
 </html>

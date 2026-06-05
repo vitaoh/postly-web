@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Post - Postly</title>
+  <title>Publicacao - Postly</title>
   <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/postly.css">
 </head>
 <body>
@@ -15,12 +15,12 @@
   <main class="main-panel">
     <header class="page-header">
       <div>
-        <p class="page-kicker">Post</p>
+        <p class="page-kicker">Publicacao</p>
         <h1 class="page-title">Detalhes da publicacao</h1>
-        <p class="page-subtitle">Visualize o post e acompanhe os comentarios em uma tela ampla.</p>
+        <p class="page-subtitle">Visualize a publicacao e acompanhe os comentarios em uma tela ampla.</p>
       </div>
       <div class="page-actions">
-        <a class="btn outline" href="${pageContext.request.contextPath}/home">&larr; Feed</a>
+        <a class="btn outline" href="${pageContext.request.contextPath}/home">&larr; Inicio</a>
         <c:if test="${postPrincipal.userId == usuario.uid}">
           <a class="btn" href="${pageContext.request.contextPath}/editar-post?id=${postPrincipal.id}">Editar</a>
         </c:if>
@@ -37,10 +37,14 @@
       <c:set var="autorPost" value="${usuariosPorUid[postPrincipal.userId]}" />
       <article class="post-card">
         <div class="post-head">
-          <img class="avatar" src="${imagemService.src(pageContext.request.contextPath, empty autorPost.photo ? usuario.photo : autorPost.photo)}" alt="${empty autorPost.name ? usuario.name : autorPost.name}">
+          <a href="${pageContext.request.contextPath}/perfil?uid=${postPrincipal.userId}">
+            <img class="avatar" src="${imagemService.src(pageContext.request.contextPath, empty autorPost.photo ? usuario.photo : autorPost.photo)}" alt="${empty autorPost.name ? usuario.name : autorPost.name}">
+          </a>
           <div class="post-author">
-            <strong>${empty autorPost.name ? usuario.name : autorPost.name}</strong>
-            <span>@${empty autorPost.username ? usuario.username : autorPost.username}</span>
+            <a href="${pageContext.request.contextPath}/perfil?uid=${postPrincipal.userId}">
+              <strong>${empty autorPost.name ? usuario.name : autorPost.name}</strong>
+              <span>@${empty autorPost.username ? usuario.username : autorPost.username}</span>
+            </a>
           </div>
           <div class="post-actions">
             <c:if test="${postPrincipal.userId == usuario.uid}">
@@ -55,7 +59,7 @@
         </div>
         <p class="post-text">${postPrincipal.description}</p>
         <c:if test="${not empty postPrincipal.image}">
-          <img class="post-image" src="${imagemService.src(pageContext.request.contextPath, postPrincipal.image)}" alt="Midia do post">
+          <img class="post-image" src="${imagemService.src(pageContext.request.contextPath, postPrincipal.image)}" alt="Midia da publicacao">
         </c:if>
         <div class="post-metrics">
           <form class="inline-form" action="${pageContext.request.contextPath}/post" method="post">
@@ -73,10 +77,14 @@
           <c:forEach var="comentario" items="${comentarios}">
             <c:set var="autorComentario" value="${usuariosPorUid[comentario.userId]}" />
             <article class="comment">
-              <img class="avatar" src="${imagemService.src(pageContext.request.contextPath, empty autorComentario.photo ? usuario.photo : autorComentario.photo)}" alt="${empty autorComentario.name ? usuario.name : autorComentario.name}">
+              <a href="${pageContext.request.contextPath}/perfil?uid=${comentario.userId}">
+                <img class="avatar" src="${imagemService.src(pageContext.request.contextPath, empty autorComentario.photo ? usuario.photo : autorComentario.photo)}" alt="${empty autorComentario.name ? usuario.name : autorComentario.name}">
+              </a>
               <span>
-                <strong>${empty autorComentario.name ? usuario.name : autorComentario.name}</strong>
-                <small class="muted">@${empty autorComentario.username ? usuario.username : autorComentario.username}</small>
+                <a href="${pageContext.request.contextPath}/perfil?uid=${comentario.userId}">
+                  <strong>${empty autorComentario.name ? usuario.name : autorComentario.name}</strong>
+                  <small class="muted">@${empty autorComentario.username ? usuario.username : autorComentario.username}</small>
+                </a>
                 <p>${comentario.text}</p>
               </span>
               <c:if test="${comentario.userId == usuario.uid || postPrincipal.userId == usuario.uid}">

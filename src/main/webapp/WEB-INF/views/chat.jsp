@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Chat - Postly</title>
+  <title>Conversa - Postly</title>
   <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/postly.css">
 </head>
 <body>
@@ -15,9 +15,9 @@
   <main class="main-panel">
     <header class="page-header">
       <div>
-        <p class="page-kicker">Chat</p>
-        <h1 class="page-title">${outroUsuario.name}</h1>
-        <p class="page-subtitle">@${outroUsuario.username}</p>
+        <p class="page-kicker">Conversa</p>
+        <h1 class="page-title"><a href="${pageContext.request.contextPath}/perfil?uid=${outroUsuario.uid}">${outroUsuario.name}</a></h1>
+        <p class="page-subtitle"><a href="${pageContext.request.contextPath}/perfil?uid=${outroUsuario.uid}">@${outroUsuario.username}</a></p>
       </div>
       <div class="page-actions">
         <a class="btn outline" href="${pageContext.request.contextPath}/mensagens">&larr; Conversas</a>
@@ -35,15 +35,29 @@
         <h2 class="section-title">Conversas</h2>
         <div class="messages-list">
           <c:forEach var="conversa" items="${conversas}">
-            <a class="conversation" href="${pageContext.request.contextPath}/chat?chatId=${conversa.id}">
-              <img class="avatar" src="${imagemService.src(pageContext.request.contextPath, outroUsuario.photo)}" alt="${outroUsuario.name}">
+            <c:set var="conversaUsuario" value="${usuariosPorConversa[conversa.id]}" />
+            <c:set var="conversaUid" value="${empty conversaUsuario.uid ? outroUsuario.uid : conversaUsuario.uid}" />
+            <c:set var="conversaNome" value="${empty conversaUsuario.name ? outroUsuario.name : conversaUsuario.name}" />
+            <c:set var="conversaUsername" value="${empty conversaUsuario.username ? outroUsuario.username : conversaUsuario.username}" />
+            <c:set var="conversaFoto" value="${empty conversaUsuario.photo ? outroUsuario.photo : conversaUsuario.photo}" />
+            <c:set var="conversaHorario" value="${tempoService.dataHoraConversa(conversa)}" />
+            <article class="conversation">
+              <a href="${pageContext.request.contextPath}/perfil?uid=${conversaUid}">
+                <img class="avatar" src="${imagemService.src(pageContext.request.contextPath, conversaFoto)}" alt="${conversaNome}">
+              </a>
               <span>
-                <strong>${outroUsuario.name}</strong>
-                <p>${conversa.lastMessage}</p>
+                <a href="${pageContext.request.contextPath}/perfil?uid=${conversaUid}">
+                  <strong>${conversaNome}</strong>
+                  <small class="muted">@${conversaUsername}</small>
+                </a>
+                <p>${empty conversaHorario ? 'Sem mensagens ainda' : conversaHorario}</p>
               </span>
-              <span class="muted">chat</span>
-            </a>
+              <a class="muted" href="${pageContext.request.contextPath}/chat?chatId=${conversa.id}">abrir</a>
+            </article>
           </c:forEach>
+          <c:if test="${empty conversas}">
+            <p class="empty-state">Nenhuma conversa encontrada.</p>
+          </c:if>
         </div>
       </section>
 
@@ -52,7 +66,7 @@
           <c:forEach var="mensagem" items="${mensagens}">
             <article class="message-bubble ${mensagem.senderId == usuario.uid ? 'mine' : ''}">
               <p>${mensagem.text}</p>
-              <time>enviado</time>
+              <time>${tempoService.dataHora(mensagem.timestamp)}</time>
             </article>
           </c:forEach>
         </div>

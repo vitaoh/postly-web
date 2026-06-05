@@ -49,7 +49,7 @@ public class PostlyComentarioService {
         Comentario comentario = comentarioDAO.buscarPorId(postId, comentarioId)
                 .orElseThrow(() -> new IllegalArgumentException("Comentario nao encontrado."));
         Post post = postDAO.buscarPorId(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Post nao encontrado."));
+                .orElseThrow(() -> new IllegalArgumentException("Publicacao nao encontrada."));
 
         boolean autorComentario = usuarioAtualUid.equals(comentario.getUserId());
         boolean autorPost = usuarioAtualUid.equals(post.getUserId());

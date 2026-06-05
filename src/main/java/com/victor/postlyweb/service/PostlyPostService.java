@@ -56,7 +56,7 @@ public class PostlyPostService {
             throw new IllegalArgumentException("Usuario nao autenticado.");
         }
         if (estaVazio(descricao)) {
-            throw new IllegalArgumentException("What's on your mind?");
+            throw new IllegalArgumentException("Escreva uma descricao para publicar.");
         }
 
         Post post = new Post();
@@ -73,13 +73,13 @@ public class PostlyPostService {
     public void atualizarPost(String usuarioAtualUid, Post postAtualizado)
             throws ExecutionException, InterruptedException {
         if (postAtualizado == null || estaVazio(postAtualizado.getId())) {
-            throw new IllegalArgumentException("Post invalido.");
+            throw new IllegalArgumentException("Publicacao invalida.");
         }
 
         Post atual = postDAO.buscarPorId(postAtualizado.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Post nao encontrado."));
+                .orElseThrow(() -> new IllegalArgumentException("Publicacao nao encontrada."));
         if (!atual.getUserId().equals(usuarioAtualUid)) {
-            throw new IllegalArgumentException("Voce nao pode editar este post.");
+            throw new IllegalArgumentException("Voce nao pode editar esta publicacao.");
         }
 
         postAtualizado.setUserId(atual.getUserId());
@@ -97,7 +97,7 @@ public class PostlyPostService {
         }
 
         Post post = postDAO.buscarPorId(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Post nao encontrado."));
+                .orElseThrow(() -> new IllegalArgumentException("Publicacao nao encontrada."));
         boolean removerCurtida = post.getLikedBy() != null && post.getLikedBy().contains(usuarioAtualUid);
         postDAO.alternarCurtida(postId, usuarioAtualUid, removerCurtida);
         return postDAO.buscarPorId(postId).orElse(post);
@@ -105,9 +105,9 @@ public class PostlyPostService {
 
     public void excluirPost(String postId, String usuarioAtualUid) throws ExecutionException, InterruptedException {
         Post post = postDAO.buscarPorId(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Post nao encontrado."));
+                .orElseThrow(() -> new IllegalArgumentException("Publicacao nao encontrada."));
         if (!post.getUserId().equals(usuarioAtualUid)) {
-            throw new IllegalArgumentException("Voce nao pode excluir este post.");
+            throw new IllegalArgumentException("Voce nao pode excluir esta publicacao.");
         }
         postDAO.excluir(postId);
     }

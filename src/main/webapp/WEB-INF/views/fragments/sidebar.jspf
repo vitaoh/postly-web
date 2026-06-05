@@ -1,24 +1,16 @@
 <aside class="sidebar">
-  <a class="brand" href="${pageContext.request.contextPath}/home" aria-label="Postly home">
+  <a class="brand" href="${pageContext.request.contextPath}/home" aria-label="Inicio do Postly">
     <img src="${pageContext.request.contextPath}/assets/img/logo.png" alt="">
     <span>Postly</span>
   </a>
 
   <nav class="side-nav" aria-label="Principal">
-    <a href="${pageContext.request.contextPath}/home">Inicio</a>
-    <a href="${pageContext.request.contextPath}/postar">Novo post</a>
-    <a href="${pageContext.request.contextPath}/mensagens">Mensagens</a>
-    <a href="${pageContext.request.contextPath}/perfil">Perfil</a>
-    <a href="${pageContext.request.contextPath}/configuracoes">Configuracoes</a>
+    <a class="${pageContext.request.servletPath == '/home' ? 'active' : ''}" href="${pageContext.request.contextPath}/home">Inicio</a>
+    <a class="${pageContext.request.servletPath == '/postar' ? 'active' : ''}" href="${pageContext.request.contextPath}/postar">Nova publicacao</a>
+    <a class="${pageContext.request.servletPath == '/mensagens' || pageContext.request.servletPath == '/chat' ? 'active' : ''}" href="${pageContext.request.contextPath}/mensagens">Mensagens</a>
+    <a class="${pageContext.request.servletPath == '/perfil' ? 'active' : ''}" href="${pageContext.request.contextPath}/perfil">Perfil</a>
+    <a class="${pageContext.request.servletPath == '/configuracoes' || pageContext.request.servletPath == '/mudar-senha' ? 'active' : ''}" href="${pageContext.request.contextPath}/configuracoes">Configuracoes</a>
   </nav>
-
-  <section class="status-card ${firebaseOnline ? 'online' : 'offline'}">
-    <span class="status-dot"></span>
-    <div>
-      <strong>Banco de dados</strong>
-      <p>${firebaseStatus}</p>
-    </div>
-  </section>
 
   <a class="sidebar-user" href="${pageContext.request.contextPath}/perfil">
     <img class="avatar" src="${imagemService.src(pageContext.request.contextPath, usuario.photo)}" alt="${usuario.name}">

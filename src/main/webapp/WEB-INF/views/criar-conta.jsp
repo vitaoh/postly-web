@@ -17,9 +17,8 @@
     </a>
     <div>
       <h1>Crie sua conta no Postly.</h1>
-      <p>O cadastro web segue os campos do mobile: usuario, nome, email e senha.</p>
+      <p>Escolha seu usuario, personalize seu perfil e comece a publicar em poucos passos.</p>
     </div>
-    <p>${firebaseStatus}</p>
   </section>
 
   <section class="auth-panel">
@@ -47,12 +46,14 @@
           <button class="password-toggle" type="button" data-toggle-password aria-label="Mostrar senha">Ver</button>
         </label>
         <button class="btn full" type="submit">Criar conta</button>
-        <a class="text-link" href="${pageContext.request.contextPath}/entrar">Voltar para login</a>
+        <a class="text-link auth-back-link" href="${pageContext.request.contextPath}/entrar">Voltar para login</a>
       </form>
     </section>
   </section>
 </main>
 <script src="${pageContext.request.contextPath}/assets/js/postly.js"></script>
-<script type="module" src="${pageContext.request.contextPath}/assets/js/postly-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/postly-auth.js"></script>
 </body>
 </html>

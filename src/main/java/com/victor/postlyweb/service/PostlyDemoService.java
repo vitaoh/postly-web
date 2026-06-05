@@ -36,7 +36,7 @@ public class PostlyDemoService {
                 post("8RcHtz2JAEidSAA5Psu7", "eeeeeeeeeeeeeeeeeebaaaa", "assets/img/post-demo.svg", 2, 5, 4),
                 post("EpqOEukPYGKBYQcvuLaL", "olaaa", null, 1, 3, 5),
                 post("Fzgds5mP48zWhF96xhRo", "OLaaaaa rede!!!", null, 0, 1, 6),
-                post("P1Y0EeYzRpVDFIlmPxeV", "Postly web conectado ao mesmo Firestore do app mobile.", null, 4, 2, 8)
+                post("P1Y0EeYzRpVDFIlmPxeV", "Postly Web pronto para acompanhar suas publicacoes.", null, 4, 2, 8)
         );
     }
 

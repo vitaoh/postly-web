@@ -17,12 +17,24 @@ public class PostlyUsuarioService {
     }
 
     public Usuario salvarComUsernameUnico(Usuario usuario) throws ExecutionException, InterruptedException {
+        return salvarComUsernameEEmailUnicos(usuario);
+    }
+
+    public Usuario salvarComUsernameEEmailUnicos(Usuario usuario) throws ExecutionException, InterruptedException {
         validarUsuario(usuario);
         usuario.setUsername(normalizarUsername(usuario.getUsername()));
+        usuario.setEmail(normalizarEmail(usuario.getEmail()));
 
         Optional<Usuario> existente = usuarioDAO.buscarPorUsername(usuario.getUsername());
         if (existente.isPresent() && !existente.get().getUid().equals(usuario.getUid())) {
             throw new IllegalArgumentException("Nome de usuario ja esta em uso.");
+        }
+
+        if (!estaVazio(usuario.getEmail())) {
+            Optional<Usuario> emailExistente = usuarioDAO.buscarPorEmail(usuario.getEmail());
+            if (emailExistente.isPresent() && !emailExistente.get().getUid().equals(usuario.getUid())) {
+                throw new IllegalArgumentException("E-mail ja esta em uso.");
+            }
         }
 
         return usuarioDAO.salvar(usuario);
@@ -40,6 +52,13 @@ public class PostlyUsuarioService {
             return Optional.empty();
         }
         return usuarioDAO.buscarPorUsername(username);
+    }
+
+    public Optional<Usuario> buscarPorEmail(String email) throws ExecutionException, InterruptedException {
+        if (estaVazio(email)) {
+            return Optional.empty();
+        }
+        return usuarioDAO.buscarPorEmail(email);
     }
 
     public List<String> listarSeguindoIds(String uid) throws ExecutionException, InterruptedException {
@@ -96,6 +115,10 @@ public class PostlyUsuarioService {
 
     private String normalizarUsername(String username) {
         return username == null ? "" : username.trim().toLowerCase();
+    }
+
+    private String normalizarEmail(String email) {
+        return email == null ? "" : email.trim().toLowerCase();
     }
 
     private boolean estaVazio(String valor) {
