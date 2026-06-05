@@ -5,6 +5,7 @@ document.querySelectorAll("[data-toggle-password]").forEach((button) => {
 
     const showing = input.type === "text";
     input.type = showing ? "password" : "text";
-    button.setAttribute("aria-label", showing ? "Show password" : "Hide password");
+    button.textContent = showing ? "Ver" : "Ocultar";
+    button.setAttribute("aria-label", showing ? "Mostrar senha" : "Ocultar senha");
   });
 });

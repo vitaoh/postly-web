@@ -11,6 +11,7 @@ import com.victor.postlyweb.modelo.Comentario;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
@@ -54,6 +55,22 @@ public class FirebaseComentarioDAO {
                 .map(documento -> converterComentario(documento, postId))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+    }
+
+    public Optional<Comentario> buscarPorId(String postId, String comentarioId)
+            throws ExecutionException, InterruptedException {
+        DocumentSnapshot snapshot = firestore.collection(COLECAO_POSTS)
+                .document(postId)
+                .collection(SUBCOLECAO_COMMENTS)
+                .document(comentarioId)
+                .get()
+                .get();
+
+        if (!snapshot.exists()) {
+            return Optional.empty();
+        }
+
+        return Optional.ofNullable(converterComentario(snapshot, postId));
     }
 
     public void excluir(String postId, String comentarioId) throws ExecutionException, InterruptedException {

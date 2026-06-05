@@ -1,6 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,22 +8,29 @@
   <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/postly.css">
 </head>
 <body>
-<div class="phone-shell auth-gradient">
-  <div class="statusbar">
-    <span>2:36</span>
-    <span class="status-icons"><span class="signal"></span><span class="wifi"></span><span class="battery"></span></span>
-  </div>
-  <main class="welcome-content">
-    <img class="logo-large" src="${pageContext.request.contextPath}/assets/img/logo.png" alt="Postly">
-    <p class="tagline">Share your moments.</p>
-    <section class="auth-card">
-      <h1>Welcome to Postly</h1>
+<main class="auth-shell">
+  <section class="auth-copy">
+    <a class="auth-brand" href="${pageContext.request.contextPath}/welcome">
+      <img src="${pageContext.request.contextPath}/assets/img/logo.png" alt="">
+      <span>Postly</span>
+    </a>
+    <div>
+      <h1>Share your moments.</h1>
+      <p>Uma experiencia web para acompanhar o mesmo conteudo publicado no aplicativo mobile.</p>
+    </div>
+    <p>${firebaseStatus}</p>
+  </section>
+
+  <section class="auth-panel">
+    <div class="auth-card">
+      <h1>Bem-vindo ao Postly</h1>
+      <p class="page-subtitle">Entre na sua conta ou crie um perfil para publicar e conversar.</p>
       <div class="form-stack">
-        <a class="btn full" href="${pageContext.request.contextPath}/entrar">Sign in</a>
-        <a class="btn outline full" href="${pageContext.request.contextPath}/criar-conta">Create account</a>
+        <a class="btn full" href="${pageContext.request.contextPath}/entrar">Entrar</a>
+        <a class="btn outline full" href="${pageContext.request.contextPath}/criar-conta">Criar conta</a>
       </div>
-    </section>
-  </main>
-</div>
+    </div>
+  </section>
+</main>
 </body>
 </html>

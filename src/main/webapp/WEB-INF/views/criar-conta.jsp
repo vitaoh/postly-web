@@ -1,42 +1,58 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Create account - Postly</title>
+  <title>Criar conta - Postly</title>
   <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/postly.css">
 </head>
-<body>
-<div class="phone-shell auth-gradient">
-  <div class="statusbar">
-    <span>2:37</span>
-    <span class="status-icons"><span class="signal"></span><span class="wifi"></span><span class="battery"></span></span>
-  </div>
-  <main class="auth-page">
-    <img class="logo-mark" src="${pageContext.request.contextPath}/assets/img/logo.png" alt="Postly">
+<body data-context-path="${pageContext.request.contextPath}">
+<main class="auth-shell">
+  <section class="auth-copy">
+    <a class="auth-brand" href="${pageContext.request.contextPath}/welcome">
+      <img src="${pageContext.request.contextPath}/assets/img/logo.png" alt="">
+      <span>Postly</span>
+    </a>
+    <div>
+      <h1>Crie sua conta no Postly.</h1>
+      <p>O cadastro web segue os campos do mobile: usuario, nome, email e senha.</p>
+    </div>
+    <p>${firebaseStatus}</p>
+  </section>
+
+  <section class="auth-panel">
     <section class="auth-card">
-      <h1>Create account</h1>
-      <form class="form-stack" action="${pageContext.request.contextPath}/home" method="get">
-        <input class="field" name="username" placeholder="Username" autocomplete="username">
-        <input class="field" name="name" placeholder="Name" autocomplete="name">
+      <h1>Criar conta</h1>
+      <form class="form-stack" action="${pageContext.request.contextPath}/auth/register" method="post" data-auth-register>
+        <c:if test="${not empty erro}">
+          <p class="alert danger">${erro}</p>
+        </c:if>
+        <c:if test="${not empty mensagem}">
+          <p class="alert success">${mensagem}</p>
+        </c:if>
+        <p class="alert danger" data-auth-message hidden></p>
+        <input class="field" name="username" placeholder="Usuario" autocomplete="username">
+        <input class="field" name="name" placeholder="Nome" autocomplete="name">
         <input class="field" name="email" placeholder="E-mail" type="email" autocomplete="email">
         <label class="password-field">
-          <span class="sr-only">Password</span>
-          <input class="field" name="password" placeholder="Password" type="password" autocomplete="new-password">
-          <button class="password-toggle" type="button" data-toggle-password aria-label="Show password">◉</button>
+          <span class="sr-only">Senha</span>
+          <input class="field" name="password" placeholder="Senha" type="password" autocomplete="new-password">
+          <button class="password-toggle" type="button" data-toggle-password aria-label="Mostrar senha">Ver</button>
         </label>
         <label class="password-field">
-          <span class="sr-only">Confirm password</span>
-          <input class="field" name="confirmPassword" placeholder="Confirm password" type="password" autocomplete="new-password">
-          <button class="password-toggle" type="button" data-toggle-password aria-label="Show password">◉</button>
+          <span class="sr-only">Confirmar senha</span>
+          <input class="field" name="confirmPassword" placeholder="Confirmar senha" type="password" autocomplete="new-password">
+          <button class="password-toggle" type="button" data-toggle-password aria-label="Mostrar senha">Ver</button>
         </label>
-        <button class="btn full" type="submit">Create account</button>
-        <a class="text-link" href="${pageContext.request.contextPath}/entrar">Back to login</a>
+        <button class="btn full" type="submit">Criar conta</button>
+        <a class="text-link" href="${pageContext.request.contextPath}/entrar">Voltar para login</a>
       </form>
     </section>
-  </main>
-</div>
+  </section>
+</main>
 <script src="${pageContext.request.contextPath}/assets/js/postly.js"></script>
+<script type="module" src="${pageContext.request.contextPath}/assets/js/postly-auth.js"></script>
 </body>
 </html>

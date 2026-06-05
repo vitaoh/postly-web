@@ -64,6 +64,18 @@ public class FirebaseUsuarioDAO {
                 .map(documento -> documento.toObject(Usuario.class));
     }
 
+    public List<Usuario> listarPrimeiros(int limite) throws ExecutionException, InterruptedException {
+        return firestore.collection(COLECAO_USUARIOS)
+                .limit(limite)
+                .get()
+                .get()
+                .getDocuments()
+                .stream()
+                .map(this::converterUsuario)
+                .flatMap(Optional::stream)
+                .collect(Collectors.toList());
+    }
+
     public void excluir(String uid) throws ExecutionException, InterruptedException {
         firestore.collection(COLECAO_USUARIOS)
                 .document(uid)
@@ -140,6 +152,17 @@ public class FirebaseUsuarioDAO {
 
     private DocumentReference usuarioRef(String uid) {
         return firestore.collection(COLECAO_USUARIOS).document(uid);
+    }
+
+    private Optional<Usuario> converterUsuario(DocumentSnapshot documento) {
+        Usuario usuario = documento.toObject(Usuario.class);
+        if (usuario == null) {
+            return Optional.empty();
+        }
+        if (estaVazio(usuario.getUid())) {
+            usuario.setUid(documento.getId());
+        }
+        return Optional.of(usuario);
     }
 
     private Map<String, Object> criarDocumentoFollow(String userId) {

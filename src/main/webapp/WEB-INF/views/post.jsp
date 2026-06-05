@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,55 +9,96 @@
   <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/postly.css">
 </head>
 <body>
-<div class="phone-shell">
-  <div class="statusbar">
-    <span>2:41</span>
-    <span class="status-icons"><span class="signal"></span><span class="wifi"></span><span class="battery"></span></span>
-  </div>
-  <header class="appbar compact">
-    <a class="icon-link" href="${pageContext.request.contextPath}/home" aria-label="Back">‹</a>
-    <img class="logo-mark" src="${pageContext.request.contextPath}/assets/img/logo.png" alt="Postly">
-    <span></span>
-  </header>
-  <main class="content">
-    <article class="post-card">
-      <div class="post-head">
-        <img class="avatar" src="${imagemService.src(pageContext.request.contextPath, usuario.photo)}" alt="${usuario.name}">
-        <div class="post-author">
-          <strong>${usuario.name}</strong>
-          <span>@${usuario.username} · 4d</span>
-        </div>
-        <div class="post-actions">
-          <a class="icon-link outline" href="${pageContext.request.contextPath}/editar-post" aria-label="Edit post">✎</a>
-          <button class="icon-button danger" type="button" aria-label="Delete post">⌫</button>
-        </div>
-      </div>
-      <p class="post-text">${postPrincipal.description}</p>
-      <img class="post-image" src="${imagemService.src(pageContext.request.contextPath, postPrincipal.image)}" alt="Post media">
-      <div class="post-metrics">
-        <span class="liked">♡ ${postPrincipal.likeCount}</span>
-        <span>♡ ${postPrincipal.commentCount}</span>
-      </div>
-    </article>
+<div class="app-layout">
+  <%@ include file="fragments/sidebar.jspf" %>
 
-    <h2 class="section-title">${postPrincipal.commentCount} comments</h2>
-    <section class="comments-list">
-      <c:forEach var="comentario" items="${comentarios}">
-        <article class="comment">
+  <main class="main-panel">
+    <header class="page-header">
+      <div>
+        <p class="page-kicker">Post</p>
+        <h1 class="page-title">Detalhes da publicacao</h1>
+        <p class="page-subtitle">Visualize o post e acompanhe os comentarios em uma tela ampla.</p>
+      </div>
+      <div class="page-actions">
+        <a class="btn outline" href="${pageContext.request.contextPath}/home">&larr; Feed</a>
+        <c:if test="${postPrincipal.userId == usuario.uid}">
+          <a class="btn" href="${pageContext.request.contextPath}/editar-post?id=${postPrincipal.id}">Editar</a>
+        </c:if>
+      </div>
+    </header>
+    <c:if test="${not empty erro}">
+      <p class="alert danger">${erro}</p>
+    </c:if>
+    <c:if test="${not empty mensagem}">
+      <p class="alert success">${mensagem}</p>
+    </c:if>
+
+    <section class="detail-shell">
+      <c:set var="autorPost" value="${usuariosPorUid[postPrincipal.userId]}" />
+      <article class="post-card">
+        <div class="post-head">
+          <img class="avatar" src="${imagemService.src(pageContext.request.contextPath, empty autorPost.photo ? usuario.photo : autorPost.photo)}" alt="${empty autorPost.name ? usuario.name : autorPost.name}">
+          <div class="post-author">
+            <strong>${empty autorPost.name ? usuario.name : autorPost.name}</strong>
+            <span>@${empty autorPost.username ? usuario.username : autorPost.username}</span>
+          </div>
+          <div class="post-actions">
+            <c:if test="${postPrincipal.userId == usuario.uid}">
+              <a class="icon-link outline" href="${pageContext.request.contextPath}/editar-post?id=${postPrincipal.id}">Editar</a>
+              <form class="inline-form" action="${pageContext.request.contextPath}/post" method="post">
+                <input type="hidden" name="action" value="delete-post">
+                <input type="hidden" name="postId" value="${postPrincipal.id}">
+                <button class="icon-button danger" type="submit">Excluir</button>
+              </form>
+            </c:if>
+          </div>
+        </div>
+        <p class="post-text">${postPrincipal.description}</p>
+        <c:if test="${not empty postPrincipal.image}">
+          <img class="post-image" src="${imagemService.src(pageContext.request.contextPath, postPrincipal.image)}" alt="Midia do post">
+        </c:if>
+        <div class="post-metrics">
+          <form class="inline-form" action="${pageContext.request.contextPath}/post" method="post">
+            <input type="hidden" name="action" value="like">
+            <input type="hidden" name="postId" value="${postPrincipal.id}">
+            <button class="text-link liked" type="submit">Curtidas ${postPrincipal.likeCount}</button>
+          </form>
+          <span>Comentarios ${postPrincipal.commentCount}</span>
+        </div>
+      </article>
+
+      <aside class="content-card">
+        <h2 class="section-title">${postPrincipal.commentCount} comentarios</h2>
+        <section class="comments-list">
+          <c:forEach var="comentario" items="${comentarios}">
+            <c:set var="autorComentario" value="${usuariosPorUid[comentario.userId]}" />
+            <article class="comment">
+              <img class="avatar" src="${imagemService.src(pageContext.request.contextPath, empty autorComentario.photo ? usuario.photo : autorComentario.photo)}" alt="${empty autorComentario.name ? usuario.name : autorComentario.name}">
+              <span>
+                <strong>${empty autorComentario.name ? usuario.name : autorComentario.name}</strong>
+                <small class="muted">@${empty autorComentario.username ? usuario.username : autorComentario.username}</small>
+                <p>${comentario.text}</p>
+              </span>
+              <c:if test="${comentario.userId == usuario.uid || postPrincipal.userId == usuario.uid}">
+                <form class="inline-form" action="${pageContext.request.contextPath}/post" method="post">
+                  <input type="hidden" name="action" value="delete-comment">
+                  <input type="hidden" name="postId" value="${postPrincipal.id}">
+                  <input type="hidden" name="commentId" value="${comentario.id}">
+                  <button class="icon-button danger" type="submit">Excluir</button>
+                </form>
+              </c:if>
+            </article>
+          </c:forEach>
+        </section>
+        <form class="composer-bar comment-composer" action="${pageContext.request.contextPath}/post" method="post">
+          <input type="hidden" name="action" value="comment">
+          <input type="hidden" name="postId" value="${postPrincipal.id}">
           <img class="avatar" src="${imagemService.src(pageContext.request.contextPath, usuario.photo)}" alt="${usuario.name}">
-          <span>
-            <strong>${usuario.name}</strong> <span class="muted">@${usuario.username} · 1d</span>
-            <p>${comentario.text}</p>
-          </span>
-          <button class="icon-button danger" type="button" aria-label="Delete comment">⌫</button>
-        </article>
-      </c:forEach>
+          <input class="field" name="comment" placeholder="Escreva um comentario" required>
+          <button class="btn" type="submit">Enviar</button>
+        </form>
+      </aside>
     </section>
-    <form class="composer-bar" action="${pageContext.request.contextPath}/post" method="get">
-      <img class="avatar comment-avatar" src="${imagemService.src(pageContext.request.contextPath, usuario.photo)}" alt="${usuario.name}">
-      <input class="field" name="comment" placeholder="Write a comment...">
-      <button class="btn" type="submit">➜</button>
-    </form>
   </main>
 </div>
 </body>

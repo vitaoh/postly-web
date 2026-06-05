@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -76,17 +78,18 @@ public final class FirebaseConfig {
             return new FileInputStream(caminhoCredenciais);
         }
 
-        Path diretorioAtual = Path.of(System.getProperty("user.dir"));
-        for (String caminhoLocal : CREDENTIALS_LOCAL_PATHS) {
-            Path candidato = diretorioAtual.resolve(caminhoLocal);
-            if (Files.exists(candidato)) {
-                return Files.newInputStream(candidato);
+        for (Path raiz : raizesCandidatas()) {
+            for (String caminhoLocal : CREDENTIALS_LOCAL_PATHS) {
+                Path candidato = raiz.resolve(caminhoLocal);
+                if (Files.exists(candidato)) {
+                    return Files.newInputStream(candidato);
+                }
             }
-        }
 
-        Optional<Path> credencialPrivada = buscarCredencialEmPrivate(diretorioAtual);
-        if (credencialPrivada.isPresent()) {
-            return Files.newInputStream(credencialPrivada.get());
+            Optional<Path> credencialPrivada = buscarCredencialEmPrivate(raiz);
+            if (credencialPrivada.isPresent()) {
+                return Files.newInputStream(credencialPrivada.get());
+            }
         }
 
         throw new IllegalStateException(
@@ -106,6 +109,38 @@ public final class FirebaseConfig {
                     .filter(path -> path.getFileName().toString().endsWith(".json"))
                     .filter(path -> !path.getFileName().toString().equals("serviceAccountKey.example.json"))
                     .findFirst();
+        }
+    }
+
+    private static List<Path> raizesCandidatas() {
+        List<Path> raizes = new ArrayList<>();
+        Path diretorioAtual = Path.of(System.getProperty("user.dir")).toAbsolutePath().normalize();
+        adicionarRaiz(raizes, diretorioAtual);
+        adicionarRaiz(raizes, diretorioAtual.resolve("postly-web"));
+
+        Path pai = diretorioAtual.getParent();
+        if (pai != null) {
+            adicionarRaiz(raizes, pai.resolve("postly-web"));
+        }
+
+        String catalinaBase = System.getProperty("catalina.base");
+        if (!estaVazio(catalinaBase)) {
+            Path catalinaPath = Path.of(catalinaBase).toAbsolutePath().normalize();
+            adicionarRaiz(raizes, catalinaPath);
+            adicionarRaiz(raizes, catalinaPath.resolve("postly-web"));
+        }
+
+        String userHome = System.getProperty("user.home");
+        if (!estaVazio(userHome)) {
+            adicionarRaiz(raizes, Path.of(userHome, "eclipse-workspace", "postly-web"));
+        }
+
+        return raizes;
+    }
+
+    private static void adicionarRaiz(List<Path> raizes, Path raiz) {
+        if (raiz != null && !raizes.contains(raiz)) {
+            raizes.add(raiz);
         }
     }
 }

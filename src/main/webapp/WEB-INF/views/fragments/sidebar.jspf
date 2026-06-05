@@ -1,0 +1,30 @@
+<aside class="sidebar">
+  <a class="brand" href="${pageContext.request.contextPath}/home" aria-label="Postly home">
+    <img src="${pageContext.request.contextPath}/assets/img/logo.png" alt="">
+    <span>Postly</span>
+  </a>
+
+  <nav class="side-nav" aria-label="Principal">
+    <a href="${pageContext.request.contextPath}/home">Inicio</a>
+    <a href="${pageContext.request.contextPath}/postar">Novo post</a>
+    <a href="${pageContext.request.contextPath}/mensagens">Mensagens</a>
+    <a href="${pageContext.request.contextPath}/perfil">Perfil</a>
+    <a href="${pageContext.request.contextPath}/configuracoes">Configuracoes</a>
+  </nav>
+
+  <section class="status-card ${firebaseOnline ? 'online' : 'offline'}">
+    <span class="status-dot"></span>
+    <div>
+      <strong>Banco de dados</strong>
+      <p>${firebaseStatus}</p>
+    </div>
+  </section>
+
+  <a class="sidebar-user" href="${pageContext.request.contextPath}/perfil">
+    <img class="avatar" src="${imagemService.src(pageContext.request.contextPath, usuario.photo)}" alt="${usuario.name}">
+    <span>
+      <strong>${usuario.name}</strong>
+      <small>@${usuario.username}</small>
+    </span>
+  </a>
+</aside>

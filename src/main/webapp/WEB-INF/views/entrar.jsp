@@ -1,37 +1,60 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Sign in - Postly</title>
+  <title>Entrar - Postly</title>
   <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/postly.css">
 </head>
-<body>
-<div class="phone-shell auth-gradient">
-  <div class="statusbar">
-    <span>2:37</span>
-    <span class="status-icons"><span class="signal"></span><span class="wifi"></span><span class="battery"></span></span>
-  </div>
-  <main class="auth-page">
-    <img class="logo-large" src="${pageContext.request.contextPath}/assets/img/logo.png" alt="Postly">
-    <p class="auth-subtitle">Sign in to Postly</p>
+<body data-context-path="${pageContext.request.contextPath}">
+<main class="auth-shell">
+  <section class="auth-copy">
+    <a class="auth-brand" href="${pageContext.request.contextPath}/welcome">
+      <img src="${pageContext.request.contextPath}/assets/img/logo.png" alt="">
+      <span>Postly</span>
+    </a>
+    <div>
+      <h1>Entre e continue de onde parou.</h1>
+      <p>Posts, comentarios e conversas usam a mesma estrutura do Firestore do app mobile.</p>
+    </div>
+    <p>${firebaseStatus}</p>
+  </section>
+
+  <section class="auth-panel">
     <section class="auth-card">
-      <form class="form-stack" action="${pageContext.request.contextPath}/home" method="get">
-        <input class="field" name="login" placeholder="E-mail or username" autocomplete="username">
+      <h1>Entrar</h1>
+      <form class="form-stack" action="${pageContext.request.contextPath}/auth/session" method="post" data-auth-login>
+        <c:if test="${not empty erro}">
+          <p class="alert danger">${erro}</p>
+        </c:if>
+        <c:if test="${not empty mensagem}">
+          <p class="alert success">${mensagem}</p>
+        </c:if>
+        <p class="alert danger" data-auth-message hidden></p>
+        <input class="field" name="login" placeholder="E-mail ou usuario" autocomplete="username">
         <label class="password-field">
-          <span class="sr-only">Password</span>
-          <input class="field" name="password" placeholder="Password" type="password" autocomplete="current-password">
-          <button class="password-toggle" type="button" data-toggle-password aria-label="Show password">◉</button>
+          <span class="sr-only">Senha</span>
+          <input class="field" name="password" placeholder="Senha" type="password" autocomplete="current-password">
+          <button class="password-toggle" type="button" data-toggle-password aria-label="Mostrar senha">Ver</button>
         </label>
-        <button class="btn full" type="submit">Sign in</button>
-        <a class="btn outline full" href="${pageContext.request.contextPath}/criar-conta">Create new account</a>
-        <a class="btn outline full" href="${pageContext.request.contextPath}/home">Sign in with Google</a>
-        <a class="text-link" href="${pageContext.request.contextPath}/mudar-senha">Forgot my password</a>
+        <button class="btn full" type="submit">Entrar</button>
+        <button class="btn outline full" type="button" data-google-login>Entrar com Google</button>
+        <a class="btn outline full" href="${pageContext.request.contextPath}/criar-conta">Criar nova conta</a>
+        <button class="text-link" type="button" data-reset-password>Esqueci minha senha</button>
+
+        <section class="profile-complete" data-google-profile hidden>
+          <h2>Completar perfil</h2>
+          <input class="field" name="googleName" placeholder="Nome">
+          <input class="field" name="googleUsername" placeholder="Usuario">
+          <button class="btn full" type="button" data-complete-google>Salvar e entrar</button>
+        </section>
       </form>
     </section>
-  </main>
-</div>
+  </section>
+</main>
 <script src="${pageContext.request.contextPath}/assets/js/postly.js"></script>
+<script type="module" src="${pageContext.request.contextPath}/assets/js/postly-auth.js"></script>
 </body>
 </html>

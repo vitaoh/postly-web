@@ -2,6 +2,7 @@ package com.victor.postlyweb.service;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
 import com.victor.postlyweb.modelo.Usuario;
 
@@ -47,10 +48,14 @@ public class PostlyAuthService {
     }
 
     public String verificarIdToken(String idToken) throws FirebaseAuthException {
+        return verificarToken(idToken).getUid();
+    }
+
+    public FirebaseToken verificarToken(String idToken) throws FirebaseAuthException {
         if (estaVazio(idToken)) {
             throw new IllegalArgumentException("Token de autenticacao ausente.");
         }
-        return FirebaseAuth.getInstance().verifyIdToken(idToken).getUid();
+        return FirebaseAuth.getInstance().verifyIdToken(idToken);
     }
 
     private void validarEmailSenha(String email, String senha) {
