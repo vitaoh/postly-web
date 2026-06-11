@@ -109,22 +109,55 @@ public class FirebaseChatDAO {
             throw new IllegalArgumentException("Mensagem invalida.");
         }
 
+        ChatMessage mensagem = new ChatMessage();
+        mensagem.setSenderId(senderId);
+        mensagem.setText(textoLimpo);
+        mensagem.setType("text");
+
+        return gravarMensagem(chatId, mensagem, textoLimpo);
+    }
+
+    public ChatMessage enviarMensagemMidia(String chatId, String senderId, String type,
+                                           String mediaBase64, String mediaMimeType)
+            throws ExecutionException, InterruptedException {
+        if (estaVazio(chatId) || estaVazio(senderId) || estaVazio(mediaBase64)) {
+            throw new IllegalArgumentException("Midia invalida.");
+        }
+        if (!"image".equals(type) && !"audio".equals(type)) {
+            throw new IllegalArgumentException("Tipo de midia invalido.");
+        }
+
+        // mesmo texto de preview que o Postly mobile grava ("camera Foto" / "microfone Audio"),
+        // com escapes unicode para nao depender do encoding do compilador
+        String preview = "image".equals(type)
+                ? "\uD83D\uDCF7 Foto"
+                : "\uD83C\uDFA4 \u00C1udio";
+
+        ChatMessage mensagem = new ChatMessage();
+        mensagem.setSenderId(senderId);
+        mensagem.setText(preview);
+        mensagem.setType(type);
+        mensagem.setMediaBase64(mediaBase64);
+        mensagem.setMediaMimeType(mediaMimeType == null ? "" : mediaMimeType);
+
+        return gravarMensagem(chatId, mensagem, preview);
+    }
+
+    private ChatMessage gravarMensagem(String chatId, ChatMessage mensagem, String lastMessage)
+            throws ExecutionException, InterruptedException {
         long agora = System.currentTimeMillis();
         DocumentReference chatRef = firestore.collection(COLECAO_CHATS).document(chatId);
         DocumentReference mensagemRef = chatRef.collection(SUBCOLECAO_MESSAGES).document();
 
-        ChatMessage mensagem = new ChatMessage();
         mensagem.setId(mensagemRef.getId());
         mensagem.setChatId(chatId);
-        mensagem.setSenderId(senderId);
-        mensagem.setText(textoLimpo);
         mensagem.setTimestamp(agora);
 
         WriteBatch batch = firestore.batch();
         batch.set(mensagemRef, mensagem);
         batch.update(chatRef, Map.of(
-                "lastMessage", textoLimpo,
-                "lastSenderId", senderId,
+                "lastMessage", lastMessage,
+                "lastSenderId", mensagem.getSenderId(),
                 "lastTimestamp", agora,
                 "updatedAt", agora
         ));

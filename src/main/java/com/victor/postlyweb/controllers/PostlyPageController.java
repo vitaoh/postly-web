@@ -549,7 +549,7 @@ public class PostlyPageController extends HttpServlet {
             }
             case "like" -> {
                 new PostlyPostService().alternarCurtida(postId, uid);
-                response.sendRedirect(request.getContextPath() + "/post?id=" + encode(postId));
+                response.sendRedirect(request.getContextPath() + destinoCurtida(request, postId));
             }
             case "delete-post" -> {
                 new PostlyPostService().excluirPost(postId, uid);
@@ -558,6 +558,17 @@ public class PostlyPageController extends HttpServlet {
             }
             default -> throw new IllegalArgumentException("Acao de publicacao invalida.");
         }
+    }
+
+    private String destinoCurtida(HttpServletRequest request, String postId) {
+        String redirect = param(request, "redirect");
+        if ("home".equals(redirect)) {
+            return "/home?feed=" + encode(param(request, "feed")) + "&busca=" + encode(param(request, "busca"));
+        }
+        if ("perfil".equals(redirect)) {
+            return "/perfil?uid=" + encode(param(request, "uid"));
+        }
+        return "/post?id=" + encode(postId);
     }
 
     private void acaoPerfil(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -577,8 +588,38 @@ public class PostlyPageController extends HttpServlet {
     private void enviarMensagem(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String uid = uidObrigatorio(request);
         String chatId = param(request, "chatId");
-        new PostlyChatService().enviarMensagem(chatId, uid, param(request, "message"));
+        PostlyChatService chatService = new PostlyChatService();
+
+        Part foto = parteUpload(request, "photoFile");
+        Part audio = parteUpload(request, "audioFile");
+        if (foto != null) {
+            String base64 = imagemService.partParaBase64(foto);
+            chatService.enviarMidia(chatId, uid, "image", base64, "image/jpeg");
+        } else if (audio != null) {
+            // Firestore limita o documento a ~1 MiB; base64 cresce 4/3 sobre os bytes originais
+            String base64 = imagemService.partParaBase64Bruto(audio, 700_000);
+            chatService.enviarMidia(chatId, uid, "audio", base64, mimeAudio(audio.getContentType()));
+        } else {
+            chatService.enviarMensagem(chatId, uid, param(request, "message"));
+        }
         response.sendRedirect(request.getContextPath() + "/chat?chatId=" + encode(chatId));
+    }
+
+    private String mimeAudio(String contentType) {
+        if (estaVazio(contentType)) {
+            return "audio/webm";
+        }
+        int separador = contentType.indexOf(';');
+        return separador > 0 ? contentType.substring(0, separador).trim() : contentType.trim();
+    }
+
+    private Part parteUpload(HttpServletRequest request, String campo) throws IOException, ServletException {
+        String contentType = request.getContentType();
+        if (contentType == null || !contentType.toLowerCase(Locale.ROOT).startsWith("multipart/")) {
+            return null;
+        }
+        Part part = request.getPart(campo);
+        return part == null || part.getSize() == 0 ? null : part;
     }
 
     private void salvarPerfil(HttpServletRequest request, HttpServletResponse response) throws Exception {

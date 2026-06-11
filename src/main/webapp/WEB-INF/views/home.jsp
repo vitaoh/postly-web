@@ -6,7 +6,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Inicio - Postly</title>
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/postly.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/postly.css?v=4">
 </head>
 <body>
 <div class="app-layout">
@@ -44,8 +47,8 @@
           </c:url>
           <form class="search-box" action="${pageContext.request.contextPath}/home" method="get">
             <input type="hidden" name="feed" value="${feedAtivo}">
-            <span aria-hidden="true">Buscar</span>
-            <input type="search" name="busca" value="${busca}" placeholder="Descricao, cidade ou usuario">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg>
+            <input type="search" name="busca" value="${busca}" placeholder="Buscar descricao, cidade ou usuario">
             <button class="text-link" type="submit">Buscar</button>
           </form>
           <nav class="tabs" aria-label="Filtro do feed">
@@ -70,7 +73,7 @@
               <div class="post-author">
                 <a href="${pageContext.request.contextPath}/perfil?uid=${post.userId}">
                   <strong>${empty autor.name ? usuario.name : autor.name}</strong>
-                  <span>@${empty autor.username ? usuario.username : autor.username} &middot; publicacao ${status.index + 1}</span>
+                  <span>@${empty autor.username ? usuario.username : autor.username}<c:if test="${post.timestamp > 0}"> &middot; ${tempoService.relativo(post.timestamp)}</c:if></span>
                 </a>
               </div>
               <div class="post-actions">
@@ -93,12 +96,24 @@
               </a>
             </c:if>
             <div class="post-metrics">
+              <c:set var="jaCurtiu" value="${not empty post.likedBy and post.likedBy.contains(usuario.uid)}" />
               <form class="inline-form" action="${pageContext.request.contextPath}/post" method="post">
                 <input type="hidden" name="action" value="like">
                 <input type="hidden" name="postId" value="${post.id}">
-                <button class="text-link liked" type="submit">Curtidas ${post.likeCount}</button>
+                <input type="hidden" name="redirect" value="home">
+                <input type="hidden" name="feed" value="${feedAtivo}">
+                <input type="hidden" name="busca" value="${busca}">
+                <button class="chip like-chip ${jaCurtiu ? 'active' : ''}" type="submit" title="${jaCurtiu ? 'Remover curtida' : 'Curtir'}">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="${jaCurtiu ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+                  ${post.likeCount}
+                  <span>${jaCurtiu ? 'Curtido' : 'Curtir'}</span>
+                </button>
               </form>
-              <a href="${pageContext.request.contextPath}/post?id=${post.id}">Comentarios ${post.commentCount}</a>
+              <a class="chip" href="${pageContext.request.contextPath}/post?id=${post.id}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12c0 4.1-4 7.5-9 7.5-1.2 0-2.3-.2-3.3-.5L3 21l1.6-4.1C3.6 15.6 3 13.9 3 12c0-4.1 4-7.5 9-7.5s9 3.4 9 7.5z"/></svg>
+                ${post.commentCount}
+                <span>Comentarios</span>
+              </a>
             </div>
           </article>
         </c:forEach>

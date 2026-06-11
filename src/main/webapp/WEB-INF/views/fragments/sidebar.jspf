@@ -5,11 +5,26 @@
   </a>
 
   <nav class="side-nav" aria-label="Principal">
-    <a class="${pageContext.request.servletPath == '/home' ? 'active' : ''}" href="${pageContext.request.contextPath}/home">Inicio</a>
-    <a class="${pageContext.request.servletPath == '/postar' ? 'active' : ''}" href="${pageContext.request.contextPath}/postar">Nova publicacao</a>
-    <a class="${pageContext.request.servletPath == '/mensagens' || pageContext.request.servletPath == '/chat' ? 'active' : ''}" href="${pageContext.request.contextPath}/mensagens">Mensagens</a>
-    <a class="${pageContext.request.servletPath == '/perfil' ? 'active' : ''}" href="${pageContext.request.contextPath}/perfil">Perfil</a>
-    <a class="${pageContext.request.servletPath == '/configuracoes' || pageContext.request.servletPath == '/mudar-senha' ? 'active' : ''}" href="${pageContext.request.contextPath}/configuracoes">Configuracoes</a>
+    <a class="${pageContext.request.servletPath == '/home' ? 'active' : ''}" href="${pageContext.request.contextPath}/home">
+      <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>
+      Inicio
+    </a>
+    <a class="${pageContext.request.servletPath == '/postar' ? 'active' : ''}" href="${pageContext.request.contextPath}/postar">
+      <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+      Nova publicacao
+    </a>
+    <a class="${pageContext.request.servletPath == '/mensagens' || pageContext.request.servletPath == '/chat' ? 'active' : ''}" href="${pageContext.request.contextPath}/mensagens">
+      <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12c0 4.1-4 7.5-9 7.5-1.2 0-2.3-.2-3.3-.5L3 21l1.6-4.1C3.6 15.6 3 13.9 3 12c0-4.1 4-7.5 9-7.5s9 3.4 9 7.5z"/></svg>
+      Mensagens
+    </a>
+    <a class="${pageContext.request.servletPath == '/perfil' ? 'active' : ''}" href="${pageContext.request.contextPath}/perfil">
+      <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
+      Perfil
+    </a>
+    <a class="${pageContext.request.servletPath == '/configuracoes' || pageContext.request.servletPath == '/mudar-senha' ? 'active' : ''}" href="${pageContext.request.contextPath}/configuracoes">
+      <svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.51 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9c.26.6.85 1 1.51 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1z"/></svg>
+      Configuracoes
+    </a>
   </nav>
 
   <a class="sidebar-user" href="${pageContext.request.contextPath}/perfil">

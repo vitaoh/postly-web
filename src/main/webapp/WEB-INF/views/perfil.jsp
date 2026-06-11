@@ -6,7 +6,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Perfil - Postly</title>
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/postly.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/postly.css?v=4">
 </head>
 <body>
 <div class="app-layout">
@@ -70,8 +73,18 @@
                 <div class="post-author">
                   <a href="${pageContext.request.contextPath}/perfil?uid=${post.userId}">
                     <strong>${empty autor.name ? perfil.name : autor.name}</strong>
-                    <span>@${empty autor.username ? perfil.username : autor.username} &middot; publicacao ${status.index + 1}</span>
+                    <span>@${empty autor.username ? perfil.username : autor.username}<c:if test="${post.timestamp > 0}"> &middot; ${tempoService.relativo(post.timestamp)}</c:if></span>
                   </a>
+                </div>
+                <div class="post-actions">
+                  <c:if test="${post.userId == usuario.uid}">
+                    <a class="icon-link outline" href="${pageContext.request.contextPath}/editar-post?id=${post.id}" aria-label="Editar publicacao">Editar</a>
+                    <form class="inline-form" action="${pageContext.request.contextPath}/post" method="post">
+                      <input type="hidden" name="action" value="delete-post">
+                      <input type="hidden" name="postId" value="${post.id}">
+                      <button class="icon-button danger" type="submit" aria-label="Excluir publicacao">Excluir</button>
+                    </form>
+                  </c:if>
                 </div>
               </div>
               <a class="post-open" href="${pageContext.request.contextPath}/post?id=${post.id}" aria-label="Abrir publicacao">
@@ -83,8 +96,23 @@
                 </a>
               </c:if>
               <div class="post-metrics">
-                <span class="liked">Curtidas ${post.likeCount}</span>
-                <a href="${pageContext.request.contextPath}/post?id=${post.id}">Comentarios ${post.commentCount}</a>
+                <c:set var="jaCurtiu" value="${not empty post.likedBy and post.likedBy.contains(usuario.uid)}" />
+                <form class="inline-form" action="${pageContext.request.contextPath}/post" method="post">
+                  <input type="hidden" name="action" value="like">
+                  <input type="hidden" name="postId" value="${post.id}">
+                  <input type="hidden" name="redirect" value="perfil">
+                  <input type="hidden" name="uid" value="${perfil.uid}">
+                  <button class="chip like-chip ${jaCurtiu ? 'active' : ''}" type="submit" title="${jaCurtiu ? 'Remover curtida' : 'Curtir'}">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="${jaCurtiu ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+                    ${post.likeCount}
+                    <span>${jaCurtiu ? 'Curtido' : 'Curtir'}</span>
+                  </button>
+                </form>
+                <a class="chip" href="${pageContext.request.contextPath}/post?id=${post.id}">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12c0 4.1-4 7.5-9 7.5-1.2 0-2.3-.2-3.3-.5L3 21l1.6-4.1C3.6 15.6 3 13.9 3 12c0-4.1 4-7.5 9-7.5s9 3.4 9 7.5z"/></svg>
+                  ${post.commentCount}
+                  <span>Comentarios</span>
+                </a>
               </div>
             </article>
           </c:forEach>

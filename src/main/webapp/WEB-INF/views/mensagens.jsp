@@ -6,7 +6,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Mensagens - Postly</title>
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/postly.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/postly.css?v=4">
 </head>
 <body>
 <div class="app-layout">
@@ -30,24 +33,24 @@
         <div class="messages-list">
           <c:forEach var="conversa" items="${conversas}">
             <c:set var="conversaUsuario" value="${usuariosPorConversa[conversa.id]}" />
-            <c:set var="conversaUid" value="${empty conversaUsuario.uid ? outroUsuario.uid : conversaUsuario.uid}" />
-            <c:set var="conversaNome" value="${empty conversaUsuario.name ? outroUsuario.name : conversaUsuario.name}" />
-            <c:set var="conversaUsername" value="${empty conversaUsuario.username ? outroUsuario.username : conversaUsuario.username}" />
-            <c:set var="conversaFoto" value="${empty conversaUsuario.photo ? outroUsuario.photo : conversaUsuario.photo}" />
+            <c:set var="conversaNome" value="${empty conversaUsuario.name ? 'Usuario' : conversaUsuario.name}" />
+            <c:set var="conversaUsername" value="${empty conversaUsuario.username ? 'usuario' : conversaUsuario.username}" />
             <c:set var="conversaHorario" value="${tempoService.dataHoraConversa(conversa)}" />
-            <article class="conversation">
-              <a href="${pageContext.request.contextPath}/perfil?uid=${conversaUid}">
-                <img class="avatar" src="${imagemService.src(pageContext.request.contextPath, conversaFoto)}" alt="${conversaNome}">
-              </a>
+            <a class="conversation" href="${pageContext.request.contextPath}/chat?chatId=${conversa.id}">
+              <img class="avatar" src="${imagemService.src(pageContext.request.contextPath, conversaUsuario.photo)}" alt="${conversaNome}">
               <span>
-                <a href="${pageContext.request.contextPath}/perfil?uid=${conversaUid}">
-                  <strong>${conversaNome}</strong>
-                  <small class="muted">@${conversaUsername}</small>
-                </a>
-                <p>${empty conversaHorario ? 'Sem mensagens ainda' : conversaHorario}</p>
+                <strong>${conversaNome}</strong>
+                <small class="muted">@${conversaUsername}</small>
+                <p class="conversation-preview">
+                  <c:choose>
+                    <c:when test="${empty conversa.lastMessage}">Sem mensagens ainda</c:when>
+                    <c:when test="${conversa.lastSenderId == usuario.uid}">Voce: ${conversa.lastMessage}</c:when>
+                    <c:otherwise>${conversaNome}: ${conversa.lastMessage}</c:otherwise>
+                  </c:choose>
+                </p>
               </span>
-              <a class="muted" href="${pageContext.request.contextPath}/chat?chatId=${conversa.id}">abrir</a>
-            </article>
+              <time class="conversation-time">${conversaHorario}</time>
+            </a>
           </c:forEach>
           <c:if test="${empty conversas}">
             <p class="empty-state">Nenhuma conversa encontrada.</p>

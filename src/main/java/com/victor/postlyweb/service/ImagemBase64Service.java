@@ -36,6 +36,18 @@ public class ImagemBase64Service {
         return Base64.getEncoder().encodeToString(bytes);
     }
 
+    public String partParaBase64Bruto(Part part, int maxBytes) throws IOException {
+        if (part == null || part.getSize() == 0) {
+            return null;
+        }
+        if (part.getSize() > maxBytes) {
+            throw new IllegalArgumentException("Arquivo muito grande. Limite de "
+                    + (maxBytes / 1024) + " KB.");
+        }
+        byte[] bytes = part.getInputStream().readAllBytes();
+        return Base64.getEncoder().encodeToString(bytes);
+    }
+
     public String paraDataUri(String valor) {
         if (valor == null || valor.trim().isEmpty()) {
             return null;
