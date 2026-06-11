@@ -55,9 +55,22 @@ public class FirebasePostDAO {
     }
 
     public List<Post> listarPrimeiraPagina() throws ExecutionException, InterruptedException {
-        return firestore.collection(COLECAO_POSTS)
-                .orderBy("timestamp", Query.Direction.DESCENDING)
-                .limit(PAGE_SIZE)
+        return listarFeed(null, PAGE_SIZE);
+    }
+
+    /**
+     * Pagina o feed por cursor (timestamp do ultimo post visto), como no Twitter:
+     * a primeira pagina vem sem cursor e as seguintes continuam de onde pararam.
+     */
+    public List<Post> listarFeed(Long cursorTimestamp, int limite)
+            throws ExecutionException, InterruptedException {
+        Query query = firestore.collection(COLECAO_POSTS)
+                .orderBy("timestamp", Query.Direction.DESCENDING);
+        if (cursorTimestamp != null && cursorTimestamp > 0L) {
+            query = query.startAfter(cursorTimestamp);
+        }
+
+        return query.limit(limite)
                 .get()
                 .get()
                 .getDocuments()

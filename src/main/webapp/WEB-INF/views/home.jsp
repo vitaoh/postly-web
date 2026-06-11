@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/postly.css?v=4">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/postly.css?v=5">
 </head>
 <body>
 <div class="app-layout">
@@ -63,6 +63,7 @@
           </section>
         </c:if>
 
+        <div class="feed-posts" id="feedPosts">
         <c:forEach var="post" items="${posts}" varStatus="status">
           <c:set var="autor" value="${usuariosPorUid[post.userId]}" />
           <article class="post-card">
@@ -117,6 +118,16 @@
             </div>
           </article>
         </c:forEach>
+        </div>
+
+        <c:if test="${temMais}">
+          <c:url var="maisUrl" value="/home">
+            <c:param name="feed" value="${feedAtivo}" />
+            <c:param name="busca" value="${busca}" />
+            <c:param name="cursor" value="${proximoCursor}" />
+          </c:url>
+          <a class="btn outline full" id="loadMore" href="${maisUrl}">Carregar mais publicacoes</a>
+        </c:if>
       </div>
 
       <aside class="right-rail">
@@ -145,5 +156,41 @@
     </section>
   </main>
 </div>
+<script>
+  (function () {
+    var botao = document.getElementById('loadMore');
+    var feed = document.getElementById('feedPosts');
+    if (!botao || !feed) {
+      return;
+    }
+
+    botao.addEventListener('click', function (evento) {
+      evento.preventDefault();
+      botao.textContent = 'Carregando...';
+
+      fetch(botao.href)
+        .then(function (resposta) { return resposta.text(); })
+        .then(function (html) {
+          var doc = new DOMParser().parseFromString(html, 'text/html');
+          var novos = doc.querySelectorAll('#feedPosts > article');
+          novos.forEach(function (post) {
+            feed.appendChild(document.adoptNode(post));
+          });
+
+          var proximo = doc.getElementById('loadMore');
+          if (proximo) {
+            botao.href = proximo.getAttribute('href');
+            botao.textContent = 'Carregar mais publicacoes';
+          } else {
+            botao.remove();
+          }
+        })
+        .catch(function () {
+          // fallback: navega normalmente para a proxima pagina
+          window.location.href = botao.href;
+        });
+    });
+  })();
+</script>
 </body>
 </html>

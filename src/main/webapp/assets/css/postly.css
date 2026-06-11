@@ -460,6 +460,15 @@ img {
 
 /* ---------- Publicacoes ---------- */
 
+.feed-posts {
+  display: grid;
+  gap: 20px;
+}
+
+#loadMore {
+  margin-top: 2px;
+}
+
 .post-card {
   padding: 22px;
   border: 1px solid var(--border);

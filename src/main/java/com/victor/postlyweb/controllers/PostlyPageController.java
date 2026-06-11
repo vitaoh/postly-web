@@ -42,6 +42,7 @@ public class PostlyPageController extends HttpServlet {
     private static final String SESSION_UID = "postly.uid";
     private static final String FLASH_ERRO = "flash.erro";
     private static final String FLASH_MENSAGEM = "flash.mensagem";
+    private static final int FEED_PAGE_SIZE = 5;
 
     private final PostlyDemoService demoService = new PostlyDemoService();
     private final ImagemBase64Service imagemService = new ImagemBase64Service();
@@ -136,6 +137,21 @@ public class PostlyPageController extends HttpServlet {
         List<Post> posts = carregarPostsDaTela(request, usuarioDAO, postDAO, usuarioAtual.getUid(),
                 perfilUsuario.getUid(), feedAtivo);
 
+        // paginacao por cursor no feed da home: carrega FEED_PAGE_SIZE + 1 para saber se ha mais
+        boolean ehFeedHome = "/home".equals(request.getServletPath());
+        boolean temMais = false;
+        long proximoCursor = 0L;
+        if (ehFeedHome && posts.size() > FEED_PAGE_SIZE) {
+            temMais = true;
+            posts = new ArrayList<>(posts.subList(0, FEED_PAGE_SIZE));
+        }
+        if (ehFeedHome && !posts.isEmpty()) {
+            Long ultimoTimestamp = posts.get(posts.size() - 1).getTimestamp();
+            proximoCursor = ultimoTimestamp == null ? 0L : ultimoTimestamp;
+        }
+        request.setAttribute("temMais", temMais);
+        request.setAttribute("proximoCursor", proximoCursor);
+
         List<ChatThread> conversas = estaVazio(uidSessao) ? List.of() : chatDAO.listarConversas(uidSessao);
         ChatThread chatAtual = chatAtual(chatDAO, conversas, param(request, "chatId"), param(request, "otherUid"), uidSessao);
         List<ChatMessage> mensagens = chatAtual == null ? List.of() : chatDAO.listarMensagens(chatAtual.getId());
@@ -207,11 +223,33 @@ public class PostlyPageController extends HttpServlet {
         if ("/perfil".equals(request.getServletPath()) && !estaVazio(perfilUid)) {
             return postDAO.listarPorUsuario(perfilUid);
         }
+
+        Long cursor = cursorFeed(request);
         if ("following".equals(feedAtivo)) {
             List<String> seguindo = usuarioDAO.listarSeguindoIds(usuarioAtualUid);
-            return postDAO.listarPorUsuarios(seguindo);
+            return paginarEmMemoria(postDAO.listarPorUsuarios(seguindo), cursor, FEED_PAGE_SIZE + 1);
         }
-        return postDAO.listarPrimeiraPagina();
+        return postDAO.listarFeed(cursor, FEED_PAGE_SIZE + 1);
+    }
+
+    private Long cursorFeed(HttpServletRequest request) {
+        String valor = param(request, "cursor");
+        if (estaVazio(valor)) {
+            return null;
+        }
+        try {
+            return Long.valueOf(valor);
+        } catch (NumberFormatException excecao) {
+            return null;
+        }
+    }
+
+    private List<Post> paginarEmMemoria(List<Post> posts, Long cursor, int limite) {
+        return posts.stream()
+                .filter(post -> cursor == null || cursor <= 0L
+                        || (post.getTimestamp() != null && post.getTimestamp() < cursor))
+                .limit(limite)
+                .toList();
     }
 
     private String feedAtivo(HttpServletRequest request) {
