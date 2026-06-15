@@ -78,6 +78,14 @@ public final class FirebaseConfig {
             return new FileInputStream(caminhoCredenciais);
         }
 
+        // Busca no classpath (WEB-INF/classes): viaja dentro do build e funciona
+        // em qualquer maquina sem depender do diretorio de trabalho do servidor.
+        InputStream noClasspath = FirebaseConfig.class.getClassLoader()
+                .getResourceAsStream("serviceAccountKey.json");
+        if (noClasspath != null) {
+            return noClasspath;
+        }
+
         for (Path raiz : raizesCandidatas()) {
             for (String caminhoLocal : CREDENTIALS_LOCAL_PATHS) {
                 Path candidato = raiz.resolve(caminhoLocal);
