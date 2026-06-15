@@ -89,11 +89,12 @@ Baixe a chave da conta de serviço no [Console do Firebase](https://console.fire
 (`Configurações do projeto → Contas de serviço → Gerar nova chave privada`) e salve em:
 
 ```
-private/serviceAccountKey.json
+src/main/resources/serviceAccountKey.json
 ```
 
-> Qualquer `.json` dentro de `private/` é aceito. Alternativa: variável de ambiente
-> `GOOGLE_APPLICATION_CREDENTIALS` apontando para o arquivo.
+> Essa pasta entra no build (classpath), então a chave é encontrada em qualquer máquina
+> sem configurar nada. Alternativas: variável de ambiente `GOOGLE_APPLICATION_CREDENTIALS`
+> ou a pasta `private/`, ambas apontando para o arquivo `.json`.
 
 **2a. Rodar pelo Eclipse**
 
@@ -116,7 +117,6 @@ Acesse: **http://localhost:8080/postly-web/**
 ```
 postly-web/
 ├── pom.xml
-├── private/                         # 🔑 chave do Firebase (fora do git)
 └── src/main/
     ├── java/com/victor/postlyweb/
     │   ├── config/                  # FirebaseConfig (singleton)
@@ -124,6 +124,7 @@ postly-web/
     │   ├── modelo/                  # Post, Usuario, ChatMessage, ChatThread...
     │   ├── persistencia/firebase/   # DAOs do Firestore
     │   └── service/                 # regras de negócio, auth, imagens, tempo
+    ├── resources/                   # 🔑 serviceAccountKey.json (fora do git)
     └── webapp/
         ├── assets/                  # CSS, JS e imagens
         └── WEB-INF/views/           # páginas JSP
