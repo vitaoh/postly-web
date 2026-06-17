@@ -544,6 +544,24 @@ img {
   border: 1px solid var(--border);
 }
 
+.post-location {
+  margin: 14px 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.post-location svg {
+  flex-shrink: 0;
+  color: var(--primary-strong);
+}
+
 .post-metrics {
   margin-top: 16px;
   padding-top: 14px;
@@ -594,6 +612,17 @@ button.chip:hover {
   background: rgba(211, 47, 47, 0.12);
   color: var(--danger);
   border-color: rgba(211, 47, 47, 0.25);
+}
+
+/* coracao vazado quando nao curtido, preenchido quando curtido */
+.like-chip svg {
+  fill: none;
+  transition: fill 0.15s ease, transform 0.15s ease;
+}
+
+.like-chip.active svg {
+  fill: currentColor;
+  transform: scale(1.12);
 }
 
 /* ---------- Avatares ---------- */
@@ -878,16 +907,18 @@ button.chip:hover {
 
 .stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
 }
 
 .stat {
-  padding: 15px 10px;
+  min-width: 0;
+  padding: 15px 8px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--surface-2);
   text-align: center;
+  overflow: hidden;
   transition: border-color 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
 }
 
@@ -909,11 +940,14 @@ button.chip:hover {
 }
 
 .stat span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: var(--text-muted);
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
 }
 
 .profile-summary {

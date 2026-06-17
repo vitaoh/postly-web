@@ -137,15 +137,17 @@ public class PostlyPageController extends HttpServlet {
         List<Post> posts = carregarPostsDaTela(request, usuarioDAO, postDAO, usuarioAtual.getUid(),
                 perfilUsuario.getUid(), feedAtivo);
 
-        // paginacao por cursor no feed da home: carrega FEED_PAGE_SIZE + 1 para saber se ha mais
+        // paginacao por cursor no feed da home: carrega FEED_PAGE_SIZE + 1 para saber se ha mais.
+        // durante a busca nao paginamos (procuramos em todas as publicacoes).
         boolean ehFeedHome = "/home".equals(request.getServletPath());
+        boolean buscando = !estaVazio(busca);
         boolean temMais = false;
         long proximoCursor = 0L;
-        if (ehFeedHome && posts.size() > FEED_PAGE_SIZE) {
+        if (ehFeedHome && !buscando && posts.size() > FEED_PAGE_SIZE) {
             temMais = true;
             posts = new ArrayList<>(posts.subList(0, FEED_PAGE_SIZE));
         }
-        if (ehFeedHome && !posts.isEmpty()) {
+        if (ehFeedHome && !buscando && !posts.isEmpty()) {
             Long ultimoTimestamp = posts.get(posts.size() - 1).getTimestamp();
             proximoCursor = ultimoTimestamp == null ? 0L : ultimoTimestamp;
         }
@@ -224,12 +226,17 @@ public class PostlyPageController extends HttpServlet {
             return postDAO.listarPorUsuario(perfilUid);
         }
 
-        Long cursor = cursorFeed(request);
+        // durante a busca carregamos um lote grande e ignoramos o cursor,
+        // para procurar em todas as publicacoes e nao so na pagina atual
+        boolean buscando = !estaVazio(param(request, "busca"));
+        Long cursor = buscando ? null : cursorFeed(request);
+        int limite = buscando ? 500 : FEED_PAGE_SIZE + 1;
+
         if ("following".equals(feedAtivo)) {
             List<String> seguindo = usuarioDAO.listarSeguindoIds(usuarioAtualUid);
-            return paginarEmMemoria(postDAO.listarPorUsuarios(seguindo), cursor, FEED_PAGE_SIZE + 1);
+            return paginarEmMemoria(postDAO.listarPorUsuarios(seguindo), cursor, limite);
         }
-        return postDAO.listarFeed(cursor, FEED_PAGE_SIZE + 1);
+        return postDAO.listarFeed(cursor, limite);
     }
 
     private Long cursorFeed(HttpServletRequest request) {
@@ -258,7 +265,7 @@ public class PostlyPageController extends HttpServlet {
     }
 
     private List<Post> filtrarPosts(List<Post> posts, String busca, Map<String, Usuario> usuariosPorUid) {
-        String termo = busca == null ? "" : busca.trim().toLowerCase(Locale.ROOT);
+        String termo = normalizar(busca);
         if (termo.isEmpty()) {
             return posts;
         }
@@ -279,7 +286,17 @@ public class PostlyPageController extends HttpServlet {
     }
 
     private boolean contem(String valor, String termo) {
-        return valor != null && valor.toLowerCase(Locale.ROOT).contains(termo);
+        return valor != null && normalizar(valor).contains(termo);
+    }
+
+    // deixa o texto minusculo e sem acentos para a busca ignorar "sao" x "São"
+    private String normalizar(String valor) {
+        if (valor == null) {
+            return "";
+        }
+        String semAcento = java.text.Normalizer.normalize(valor.trim(), java.text.Normalizer.Form.NFD)
+                .replaceAll("\\p{M}+", "");
+        return semAcento.toLowerCase(Locale.ROOT);
     }
 
     private Post postPrincipal(FirebasePostDAO postDAO, List<Post> posts, String postId) throws Exception {
@@ -586,7 +603,15 @@ public class PostlyPageController extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/post?id=" + encode(postId));
             }
             case "like" -> {
-                new PostlyPostService().alternarCurtida(postId, uid);
+                Post atualizado = new PostlyPostService().alternarCurtida(postId, uid);
+                if (ehAjax(request)) {
+                    boolean curtido = atualizado.getLikedBy() != null
+                            && atualizado.getLikedBy().contains(uid);
+                    responderJson(response, true, Map.of(
+                            "likeCount", String.valueOf(atualizado.getLikeCount()),
+                            "liked", String.valueOf(curtido)));
+                    return;
+                }
                 response.sendRedirect(request.getContextPath() + destinoCurtida(request, postId));
             }
             case "delete-post" -> {
@@ -596,6 +621,10 @@ public class PostlyPageController extends HttpServlet {
             }
             default -> throw new IllegalArgumentException("Acao de publicacao invalida.");
         }
+    }
+
+    private boolean ehAjax(HttpServletRequest request) {
+        return "fetch".equalsIgnoreCase(request.getHeader("X-Requested-With"));
     }
 
     private String destinoCurtida(HttpServletRequest request, String postId) {

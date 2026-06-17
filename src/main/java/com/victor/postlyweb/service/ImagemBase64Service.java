@@ -21,6 +21,12 @@ public class ImagemBase64Service {
     private static final float JPEG_QUALITY = 0.70f;
     private static final String AVATAR_PADRAO = "assets/img/avatar-demo.svg";
 
+    static {
+        // No Linux (servidor sem interface grafica) o AWT tenta conectar ao X11 e falha
+        // ao processar imagens. Em modo headless o redimensionamento funciona normalmente.
+        System.setProperty("java.awt.headless", "true");
+    }
+
     public String partParaBase64(Part part) throws IOException {
         if (part == null || part.getSize() == 0) {
             return null;

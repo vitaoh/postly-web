@@ -6,10 +6,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Publicacao - Postly</title>
+  <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/assets/img/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/postly.css?v=5">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/postly.css?v=7">
 </head>
 <body>
 <div class="app-layout">
@@ -64,15 +65,21 @@
         <c:if test="${not empty postPrincipal.image}">
           <img class="post-image" src="${imagemService.src(pageContext.request.contextPath, postPrincipal.image)}" alt="Midia da publicacao">
         </c:if>
+        <c:if test="${not empty postPrincipal.locationName}">
+          <p class="post-location">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.3-7-11a7 7 0 0 1 14 0c0 4.7-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+            ${postPrincipal.locationName}
+          </p>
+        </c:if>
         <div class="post-metrics">
           <c:set var="jaCurtiu" value="${not empty postPrincipal.likedBy and postPrincipal.likedBy.contains(usuario.uid)}" />
-          <form class="inline-form" action="${pageContext.request.contextPath}/post" method="post">
+          <form class="inline-form like-form" action="${pageContext.request.contextPath}/post" method="post">
             <input type="hidden" name="action" value="like">
             <input type="hidden" name="postId" value="${postPrincipal.id}">
             <button class="chip like-chip ${jaCurtiu ? 'active' : ''}" type="submit" title="${jaCurtiu ? 'Remover curtida' : 'Curtir'}">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="${jaCurtiu ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
-              ${postPrincipal.likeCount}
-              <span>${jaCurtiu ? 'Curtido' : 'Curtir'}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+              <span class="like-count">${postPrincipal.likeCount}</span>
+              <span class="like-label">${jaCurtiu ? 'Curtido' : 'Curtir'}</span>
             </button>
           </form>
           <span class="chip">
@@ -95,7 +102,7 @@
               <span>
                 <a href="${pageContext.request.contextPath}/perfil?uid=${comentario.userId}">
                   <strong>${empty autorComentario.name ? usuario.name : autorComentario.name}</strong>
-                  <small class="muted">@${empty autorComentario.username ? usuario.username : autorComentario.username}</small>
+                  <small class="muted">@${empty autorComentario.username ? usuario.username : autorComentario.username}<c:if test="${comentario.timestamp > 0}"> &middot; ${tempoService.relativo(comentario.timestamp)}</c:if></small>
                 </a>
                 <p>${comentario.text}</p>
               </span>
@@ -121,5 +128,6 @@
     </section>
   </main>
 </div>
+<script src="${pageContext.request.contextPath}/assets/js/postly-like.js?v=1"></script>
 </body>
 </html>
