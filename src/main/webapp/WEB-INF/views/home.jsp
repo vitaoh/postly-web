@@ -67,7 +67,7 @@
         <div class="feed-posts" id="feedPosts">
         <c:forEach var="post" items="${posts}" varStatus="status">
           <c:set var="autor" value="${usuariosPorUid[post.userId]}" />
-          <article class="post-card">
+          <article class="post-card" id="post-${post.id}">
             <div class="post-head">
               <a href="${pageContext.request.contextPath}/perfil?uid=${post.userId}">
                 <img class="avatar" src="${imagemService.src(pageContext.request.contextPath, empty autor.photo ? usuario.photo : autor.photo)}" alt="${empty autor.name ? usuario.name : autor.name}">

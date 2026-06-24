@@ -66,7 +66,7 @@
           <h2 class="section-title">Publicacoes</h2>
           <c:forEach var="post" items="${posts}" varStatus="status">
             <c:set var="autor" value="${usuariosPorUid[post.userId]}" />
-            <article class="post-card">
+            <article class="post-card" id="post-${post.id}">
               <div class="post-head">
                 <a href="${pageContext.request.contextPath}/perfil?uid=${post.userId}">
                   <img class="avatar" src="${imagemService.src(pageContext.request.contextPath, empty autor.photo ? perfil.photo : autor.photo)}" alt="${empty autor.name ? perfil.name : autor.name}">

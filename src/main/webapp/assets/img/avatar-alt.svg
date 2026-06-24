@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-label="Postly user avatar">
-  <rect width="160" height="160" rx="80" fill="#203040"/>
-  <circle cx="80" cy="62" r="28" fill="#cad6e8"/>
-  <path d="M32 138c10-33 31-51 48-51s38 18 48 51" fill="#cad6e8"/>
-  <path d="M42 50c18-25 57-27 78 1" stroke="#6ee7b7" stroke-width="8" fill="none"/>
-</svg>

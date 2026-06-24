@@ -50,7 +50,7 @@
         <section class="profile-complete" data-google-profile hidden>
           <h2>Completar perfil</h2>
           <div class="google-profile-preview">
-            <img class="avatar large" data-google-photo src="${pageContext.request.contextPath}/assets/img/avatar-demo.svg" alt="">
+            <img class="avatar large" data-google-photo src="${pageContext.request.contextPath}/assets/img/avatar-default.svg" alt="">
             <span>
               <strong data-google-name>Conta Google</strong>
               <small class="muted" data-google-email></small>

@@ -92,7 +92,7 @@
 
     profileBox.hidden = false;
     profileBox.setAttribute("data-id-token", idToken);
-    profileBox.querySelector("[data-google-photo]").src = result.photo || endpoint("/assets/img/avatar-demo.svg");
+    profileBox.querySelector("[data-google-photo]").src = result.photo || endpoint("/assets/img/avatar-default.svg");
     profileBox.querySelector("[data-google-name]").textContent = result.name || "Conta Google";
     profileBox.querySelector("[data-google-email]").textContent = result.email || "";
     profileBox.querySelector("[name='googleName']").value = result.name || "";

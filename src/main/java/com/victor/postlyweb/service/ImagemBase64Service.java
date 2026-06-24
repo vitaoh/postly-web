@@ -11,6 +11,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Base64;
@@ -20,12 +21,15 @@ public class ImagemBase64Service {
 
     private static final int MAX_DIMENSION = 800;
     private static final float JPEG_QUALITY = 0.70f;
-    private static final String AVATAR_PADRAO = "assets/img/avatar-demo.svg";
+    private static final String AVATAR_PADRAO = "assets/img/avatar-default.svg";
+    // limite dos bytes originais quando o redimensionamento falha (Firestore aceita ~1 MiB por documento)
+    private static final int MAX_BYTES_SEM_REDUZIR = 900_000;
 
     static {
-        // No Linux (servidor sem interface grafica) o AWT tenta conectar ao X11 e falha
-        // ao processar imagens. Em modo headless o redimensionamento funciona normalmente.
+        // No Linux (servidor sem interface grafica) o AWT tenta usar o X11 e o ImageIO
+        // tenta um cache em disco; ambos podem falhar. Modo headless + cache em memoria evitam isso.
         System.setProperty("java.awt.headless", "true");
+        ImageIO.setUseCache(false);
     }
 
     public String partParaBase64(Part part) throws IOException {
@@ -33,14 +37,26 @@ public class ImagemBase64Service {
             return null;
         }
 
-        BufferedImage imagem = ImageIO.read(part.getInputStream());
-        if (imagem == null) {
-            throw new IllegalArgumentException("Arquivo de imagem invalido.");
+        // le os bytes uma vez para poder tentar o redimensionamento e, se falhar, usar o original
+        byte[] original = part.getInputStream().readAllBytes();
+
+        try {
+            BufferedImage imagem = ImageIO.read(new ByteArrayInputStream(original));
+            if (imagem != null) {
+                byte[] bytes = jpegBytes(reduzir(imagem));
+                return Base64.getEncoder().encodeToString(bytes);
+            }
+        } catch (Throwable falha) {
+            // qualquer erro do AWT/ImageIO no servidor (ex.: Linux) cai no plano B abaixo
         }
 
-        BufferedImage reduzida = reduzir(imagem);
-        byte[] bytes = jpegBytes(reduzida);
-        return Base64.getEncoder().encodeToString(bytes);
+        // plano B: envia a imagem original sem reprocessar, desde que caiba no documento
+        if (original.length > MAX_BYTES_SEM_REDUZIR) {
+            throw new IllegalArgumentException(
+                    "Nao foi possivel reduzir a imagem neste servidor e o arquivo e grande demais. "
+                            + "Envie uma foto menor (ate " + (MAX_BYTES_SEM_REDUZIR / 1024) + " KB).");
+        }
+        return Base64.getEncoder().encodeToString(original);
     }
 
     public String partParaBase64Bruto(Part part, int maxBytes) throws IOException {

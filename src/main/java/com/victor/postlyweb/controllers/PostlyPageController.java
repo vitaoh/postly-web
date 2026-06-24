@@ -14,7 +14,6 @@ import com.victor.postlyweb.service.ImagemBase64Service;
 import com.victor.postlyweb.service.PostlyAuthService;
 import com.victor.postlyweb.service.PostlyChatService;
 import com.victor.postlyweb.service.PostlyComentarioService;
-import com.victor.postlyweb.service.PostlyDemoService;
 import com.victor.postlyweb.service.PostlyPostService;
 import com.victor.postlyweb.service.PostlyUsuarioService;
 import com.victor.postlyweb.service.TempoService;
@@ -44,7 +43,6 @@ public class PostlyPageController extends HttpServlet {
     private static final String FLASH_MENSAGEM = "flash.mensagem";
     private static final int FEED_PAGE_SIZE = 5;
 
-    private final PostlyDemoService demoService = new PostlyDemoService();
     private final ImagemBase64Service imagemService = new ImagemBase64Service();
     private final TempoService tempoService = new TempoService();
     private final PostlyAuthService authService = new PostlyAuthService();
@@ -104,20 +102,20 @@ public class PostlyPageController extends HttpServlet {
         }
     }
 
-    private boolean carregarDadosComuns(HttpServletRequest request, boolean permitirDemo) {
+    private boolean carregarDadosComuns(HttpServletRequest request, boolean rotaPublica) {
         request.setAttribute("imagemService", imagemService);
         request.setAttribute("tempoService", tempoService);
+        // paginas publicas (welcome/entrar/criar-conta) sao estaticas e nao precisam do Firebase
+        if (rotaPublica) {
+            return true;
+        }
         try {
             carregarDadosFirebase(request);
             return true;
         } catch (Exception exception) {
-            if (!permitirDemo) {
-                adicionarFlash(request, FLASH_ERRO, "Nao foi possivel carregar seus dados agora: "
-                        + mensagemCurta(exception));
-                return false;
-            }
-            carregarDadosDemo(request);
-            return true;
+            adicionarFlash(request, FLASH_ERRO, "Nao foi possivel carregar seus dados agora: "
+                    + mensagemCurta(exception));
+            return false;
         }
     }
 
@@ -206,7 +204,8 @@ public class PostlyPageController extends HttpServlet {
                     .orElseThrow(() -> new IllegalStateException("Sessao encontrada, mas o perfil nao existe em users."));
         }
 
-        return usuarios.stream().findFirst().orElse(demoService.usuarioAtual());
+        return usuarios.stream().findFirst()
+                .orElseThrow(() -> new IllegalStateException("Nenhum usuario disponivel."));
     }
 
     private Usuario perfilUsuario(FirebaseUsuarioDAO usuarioDAO, Usuario usuarioAtual, String perfilUid) throws Exception {
@@ -348,7 +347,7 @@ public class PostlyPageController extends HttpServlet {
         return usuarios.stream()
                 .filter(usuario -> !usuario.getUid().equals(usuarioAtual.getUid()))
                 .findFirst()
-                .orElse(demoService.outroUsuario());
+                .orElse(new Usuario());
     }
 
     private Map<String, Usuario> usuariosPorUid(FirebaseUsuarioDAO usuarioDAO, List<Usuario> usuarios, Usuario usuarioAtual,
@@ -422,37 +421,6 @@ public class PostlyPageController extends HttpServlet {
         if (usuario != null && !estaVazio(usuario.getUid())) {
             mapa.put(usuario.getUid(), usuario);
         }
-    }
-
-    private void carregarDadosDemo(HttpServletRequest request) {
-        Map<String, Usuario> usuariosPorUid = new HashMap<>();
-        Map<String, Usuario> usuariosPorConversa = new HashMap<>();
-        adicionarUsuario(usuariosPorUid, demoService.usuarioAtual());
-        adicionarUsuario(usuariosPorUid, demoService.outroUsuario());
-        adicionarUsuarioPorConversa(usuariosPorConversa, demoService.conversas().get(0).getId(), demoService.outroUsuario());
-
-        request.setAttribute("usuario", demoService.usuarioAtual());
-        request.setAttribute("perfil", demoService.usuarioAtual());
-        request.setAttribute("perfilEhAtual", true);
-        request.setAttribute("perfilSeguidoresCount", 1);
-        request.setAttribute("perfilSeguindoCount", 1);
-        request.setAttribute("perfilSeguidoPeloAtual", false);
-        request.setAttribute("outroUsuario", demoService.outroUsuario());
-        request.setAttribute("usuariosPorConversa", usuariosPorConversa);
-        request.setAttribute("usuariosPorUid", usuariosPorUid);
-        request.setAttribute("posts", demoService.posts());
-        request.setAttribute("postPrincipal", demoService.posts().get(0));
-        request.setAttribute("comentarios", demoService.comentarios());
-        request.setAttribute("conversas", demoService.conversas());
-        request.setAttribute("chatAtual", demoService.conversas().get(0));
-        request.setAttribute("mensagens", demoService.mensagens());
-        request.setAttribute("autenticado", false);
-        request.setAttribute("usuariosCount", 0);
-        request.setAttribute("postsCount", demoService.posts().size());
-        request.setAttribute("comentariosCount", demoService.comentarios().size());
-        request.setAttribute("conversasCount", demoService.conversas().size());
-        request.setAttribute("usuarioPostsCount", demoService.posts().size());
-        request.setAttribute("usuarioComentariosCount", demoService.comentarios().size());
     }
 
     private void resolverUsername(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -629,11 +597,13 @@ public class PostlyPageController extends HttpServlet {
 
     private String destinoCurtida(HttpServletRequest request, String postId) {
         String redirect = param(request, "redirect");
+        // ancora #post-ID faz a pagina voltar para a publicacao curtida, e nao para o topo
+        String ancora = estaVazio(postId) ? "" : "#post-" + postId;
         if ("home".equals(redirect)) {
-            return "/home?feed=" + encode(param(request, "feed")) + "&busca=" + encode(param(request, "busca"));
+            return "/home?feed=" + encode(param(request, "feed")) + "&busca=" + encode(param(request, "busca")) + ancora;
         }
         if ("perfil".equals(redirect)) {
-            return "/perfil?uid=" + encode(param(request, "uid"));
+            return "/perfil?uid=" + encode(param(request, "uid")) + ancora;
         }
         return "/post?id=" + encode(postId);
     }
