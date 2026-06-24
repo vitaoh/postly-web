@@ -6,6 +6,3 @@ private/*.json
 
 # Build output
 target/
-
-# Local server downloads
-apache-tomcat-*.zip
