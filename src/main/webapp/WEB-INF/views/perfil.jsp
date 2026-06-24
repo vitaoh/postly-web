@@ -152,6 +152,6 @@
     </section>
   </main>
 </div>
-<script src="${pageContext.request.contextPath}/assets/js/postly-like.js?v=1"></script>
+<script src="${pageContext.request.contextPath}/assets/js/postly-like.js?v=2"></script>
 </body>
 </html>
