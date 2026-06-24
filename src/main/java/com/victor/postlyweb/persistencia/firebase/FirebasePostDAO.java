@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 public class FirebasePostDAO {
 
     private static final String COLECAO_POSTS = "posts";
-    private static final int PAGE_SIZE = 5;
 
     private final Firestore firestore;
 
@@ -52,10 +51,6 @@ public class FirebasePostDAO {
         }
 
         return Optional.ofNullable(post);
-    }
-
-    public List<Post> listarPrimeiraPagina() throws ExecutionException, InterruptedException {
-        return listarFeed(null, PAGE_SIZE);
     }
 
     /**

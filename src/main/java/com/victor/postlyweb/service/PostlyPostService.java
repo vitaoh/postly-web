@@ -2,44 +2,17 @@ package com.victor.postlyweb.service;
 
 import com.victor.postlyweb.modelo.Post;
 import com.victor.postlyweb.persistencia.firebase.FirebasePostDAO;
-import com.victor.postlyweb.persistencia.firebase.FirebaseUsuarioDAO;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 public class PostlyPostService {
 
     private final FirebasePostDAO postDAO;
-    private final FirebaseUsuarioDAO usuarioDAO;
 
     public PostlyPostService() throws IOException {
         this.postDAO = new FirebasePostDAO();
-        this.usuarioDAO = new FirebaseUsuarioDAO();
-    }
-
-    public List<Post> carregarFeedForYou(String busca) throws ExecutionException, InterruptedException {
-        return filtrar(postDAO.listarPrimeiraPagina(), busca);
-    }
-
-    public List<Post> carregarFeedFollowing(String usuarioAtualUid, String busca)
-            throws ExecutionException, InterruptedException {
-        if (estaVazio(usuarioAtualUid)) {
-            return List.of();
-        }
-
-        List<String> seguindo = usuarioDAO.listarSeguindoIds(usuarioAtualUid);
-        return filtrar(postDAO.listarPorUsuarios(seguindo), busca);
-    }
-
-    public List<Post> listarPostsDoUsuario(String uid) throws ExecutionException, InterruptedException {
-        if (estaVazio(uid)) {
-            return List.of();
-        }
-        return postDAO.listarPorUsuario(uid);
     }
 
     public Optional<Post> buscarPost(String postId) throws ExecutionException, InterruptedException {
@@ -110,23 +83,6 @@ public class PostlyPostService {
             throw new IllegalArgumentException("Voce nao pode excluir esta publicacao.");
         }
         postDAO.excluir(postId);
-    }
-
-    private List<Post> filtrar(List<Post> posts, String busca) {
-        String termo = busca == null ? "" : busca.trim().toLowerCase(Locale.ROOT);
-        if (termo.isEmpty()) {
-            return posts;
-        }
-
-        return posts.stream()
-                .filter(post -> contem(post.getDescription(), termo)
-                        || contem(post.getLocationName(), termo)
-                        || contem(post.getUserId(), termo))
-                .collect(Collectors.toList());
-    }
-
-    private boolean contem(String valor, String termo) {
-        return valor != null && valor.toLowerCase(Locale.ROOT).contains(termo);
     }
 
     private boolean estaVazio(String valor) {

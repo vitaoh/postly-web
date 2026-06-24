@@ -49,7 +49,7 @@ public class FirebaseUsuarioDAO {
             return Optional.empty();
         }
 
-        return Optional.ofNullable(snapshot.toObject(Usuario.class));
+        return converterUsuario(snapshot);
     }
 
     public Optional<Usuario> buscarPorUsername(String username) throws ExecutionException, InterruptedException {
@@ -61,7 +61,7 @@ public class FirebaseUsuarioDAO {
 
         return resultado.getDocuments().stream()
                 .findFirst()
-                .map(documento -> documento.toObject(Usuario.class));
+                .flatMap(this::converterUsuario);
     }
 
     public Optional<Usuario> buscarPorEmail(String email) throws ExecutionException, InterruptedException {
@@ -73,7 +73,7 @@ public class FirebaseUsuarioDAO {
 
         return resultado.getDocuments().stream()
                 .findFirst()
-                .map(documento -> documento.toObject(Usuario.class));
+                .flatMap(this::converterUsuario);
     }
 
     public List<Usuario> listarPrimeiros(int limite) throws ExecutionException, InterruptedException {

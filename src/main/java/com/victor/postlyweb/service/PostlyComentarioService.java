@@ -6,7 +6,6 @@ import com.victor.postlyweb.persistencia.firebase.FirebaseComentarioDAO;
 import com.victor.postlyweb.persistencia.firebase.FirebasePostDAO;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class PostlyComentarioService {
@@ -17,13 +16,6 @@ public class PostlyComentarioService {
     public PostlyComentarioService() throws IOException {
         this.comentarioDAO = new FirebaseComentarioDAO();
         this.postDAO = new FirebasePostDAO();
-    }
-
-    public List<Comentario> listarComentarios(String postId) throws ExecutionException, InterruptedException {
-        if (estaVazio(postId)) {
-            return List.of();
-        }
-        return comentarioDAO.listarPorPost(postId);
     }
 
     public Comentario adicionarComentario(String postId, String usuarioAtualUid, String texto)

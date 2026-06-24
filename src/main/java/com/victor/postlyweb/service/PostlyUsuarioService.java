@@ -68,20 +68,6 @@ public class PostlyUsuarioService {
         return usuarioDAO.listarSeguindoIds(uid);
     }
 
-    public PerfilInfo carregarPerfil(String perfilUid, String usuarioAtualUid)
-            throws ExecutionException, InterruptedException {
-        Usuario usuario = usuarioDAO.buscarPorUid(perfilUid)
-                .orElseThrow(() -> new IllegalArgumentException("Usuario nao encontrado."));
-
-        int seguidores = usuarioDAO.contarSeguidores(perfilUid);
-        int seguindo = usuarioDAO.contarSeguindo(perfilUid);
-        boolean seguidoPeloAtual = !estaVazio(usuarioAtualUid)
-                && !usuarioAtualUid.equals(perfilUid)
-                && usuarioDAO.estaSeguindo(usuarioAtualUid, perfilUid);
-
-        return new PerfilInfo(usuario, seguidores, seguindo, seguidoPeloAtual);
-    }
-
     public boolean alternarSeguir(String usuarioAtualUid, String usuarioAlvoUid)
             throws ExecutionException, InterruptedException {
         if (estaVazio(usuarioAtualUid) || estaVazio(usuarioAlvoUid) || usuarioAtualUid.equals(usuarioAlvoUid)) {
@@ -123,8 +109,5 @@ public class PostlyUsuarioService {
 
     private boolean estaVazio(String valor) {
         return valor == null || valor.trim().isEmpty();
-    }
-
-    public record PerfilInfo(Usuario usuario, int seguidores, int seguindo, boolean seguidoPeloAtual) {
     }
 }

@@ -8,7 +8,7 @@
 
 ![Java](https://img.shields.io/badge/Java-17+-orange?logo=openjdk&logoColor=white)
 ![Jakarta EE](https://img.shields.io/badge/Jakarta%20EE-10-blue)
-![Tomcat](https://img.shields.io/badge/Tomcat-10.1-yellow?logo=apachetomcat&logoColor=white)
+![Tomcat](https://img.shields.io/badge/Tomcat-10.1.55-yellow?logo=apachetomcat&logoColor=white)
 ![Firebase](https://img.shields.io/badge/Firebase-Firestore-ffca28?logo=firebase&logoColor=black)
 ![Maven](https://img.shields.io/badge/Maven-build-red?logo=apachemaven)
 
@@ -62,7 +62,7 @@
 ## 🛠️ Tecnologias
 
 - **Java 17** + **Jakarta Servlet 6 / JSP 3.1 / JSTL 3**
-- **Apache Tomcat 10.1**
+- **Apache Tomcat 10.1.55** (versão homologada do projeto)
 - **Maven** (empacotamento WAR)
 - **Firebase Admin SDK 9** (Firestore + verificação de tokens)
 - **Firebase Auth** no front-end (e-mail/senha e Google)
@@ -73,7 +73,8 @@
 ### Pré-requisitos
 
 - JDK 17+
-- Apache Tomcat **10.1+** (precisa ser 10+, o projeto usa `jakarta.*`)
+- **Apache Tomcat 10.1.55** — use exatamente esta versão. O projeto usa a API `jakarta.*`,
+  então **não funciona** em Tomcat 9 ou anterior, e foi homologado na 10.1.55.
 - Maven (ou Eclipse for Enterprise Java)
 
 ### Passo a passo
@@ -99,7 +100,7 @@ src/main/resources/serviceAccountKey.json
 **2a. Rodar pelo Eclipse**
 
 1. `File → Import → Maven → Existing Maven Projects`
-2. Aba `Servers` → `New → Server → Tomcat v10.1`
+2. Aba `Servers` → `New → Server → Tomcat v10.1` (apontando para o Tomcat 10.1.55)
 3. Botão direito no projeto → `Run As → Run on Server`
 
 **2b. Rodar pela linha de comando**
