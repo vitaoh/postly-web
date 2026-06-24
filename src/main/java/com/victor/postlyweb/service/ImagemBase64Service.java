@@ -7,6 +7,7 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
@@ -94,6 +95,11 @@ public class ImagemBase64Service {
 
         BufferedImage reduzida = new BufferedImage(novaLargura, novaAltura, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = reduzida.createGraphics();
+        
+        // CORREÇÃO LINUX: Define fundo branco para evitar que imagens transparentes (PNG/WebP) fiquem pretas
+        graphics.setColor(Color.WHITE);
+        graphics.fillRect(0, 0, novaLargura, novaAltura);
+        
         graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
         graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         graphics.drawImage(imagem, 0, 0, novaLargura, novaAltura, null);
@@ -102,12 +108,13 @@ public class ImagemBase64Service {
     }
 
     private BufferedImage paraRgb(BufferedImage imagem, int largura, int altura) {
-        if (imagem.getType() == BufferedImage.TYPE_INT_RGB) {
-            return imagem;
-        }
-
         BufferedImage rgb = new BufferedImage(largura, altura, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = rgb.createGraphics();
+        
+        // CORREÇÃO LINUX: Garante que o fundo seja preenchido de branco antes da conversão para JPEG
+        graphics.setColor(Color.WHITE);
+        graphics.fillRect(0, 0, largura, altura);
+        
         graphics.drawImage(imagem, 0, 0, null);
         graphics.dispose();
         return rgb;
