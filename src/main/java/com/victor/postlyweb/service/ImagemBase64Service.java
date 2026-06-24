@@ -22,8 +22,9 @@ public class ImagemBase64Service {
     private static final int MAX_DIMENSION = 800;
     private static final float JPEG_QUALITY = 0.70f;
     private static final String AVATAR_PADRAO = "assets/img/avatar-default.svg";
-    // limite dos bytes originais quando o redimensionamento falha (Firestore aceita ~1 MiB por documento)
-    private static final int MAX_BYTES_SEM_REDUZIR = 900_000;
+    // limite dos bytes ORIGINAIS no plano B. O Firestore aceita ~1 MiB por documento e o Base64
+    // cresce ~33%, entao 500 KB de bytes viram ~670 KB de texto, com folga abaixo do limite.
+    private static final int MAX_BYTES_SEM_REDUZIR = 500_000;
 
     static {
         // No Linux (servidor sem interface grafica) o AWT tenta usar o X11 e o ImageIO
